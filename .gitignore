@@ -1,0 +1,9 @@
+venv/
+*.py
+*.sh
+results.csv
+tracks.js
+.DS_Store
+.vercel
+.env*
+*.bak
