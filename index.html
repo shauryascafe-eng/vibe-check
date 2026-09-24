@@ -101,6 +101,13 @@ tr[draggable]{cursor:grab}tr.drag{opacity:.4}tr.dropto td{border-top:2px solid v
 audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 .x{font:700 13px 'JetBrains Mono',monospace;background:none;border:0;color:var(--dim);cursor:pointer}.x:hover{color:#c0392b}
 .empty{text-align:center;padding:40px 10px}
+.pbar[hidden]{display:none}
+.pbar{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--deck);color:#f3e6cf;box-shadow:0 -8px 24px #0005;z-index:10}
+.pbar .pnow{flex:1;min-width:0}.pbar .pnow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pbar small{color:#a8987f}
+.pctl{display:flex;gap:6px}#ytbox{width:200px;height:200px;border-radius:8px}
+body:has(.pbar:not([hidden])){padding-bottom:240px}
+#ytUrl{flex:1;min-width:220px;font:14px Inter,system-ui,sans-serif;background:var(--panel);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:9px 12px}
+#sout .act button{font:700 14px 'JetBrains Mono',monospace;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
 </style>
 
 <div class=wrap>
@@ -161,6 +168,32 @@ audio{margin-top:16px;width:100%;max-width:520px;height:36px}
     <th class="s hide" data-k=dance>Dance</th><th class="s hide" data-k=energy>Energy</th><th class="s hide" data-k=happy>Happy</th><th class="s hide" data-k=loud>Loud</th>
     <th>Match</th><th>Transition</th><th></th></tr></thead><tbody id=out></tbody></table></div>
 </section>
+
+<section class=console id=streaming>
+  <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
+  <h2>Streaming</h2>
+  <div class="rule mono">Spotify · Apple Music · YouTube · play here, match to your analysed tracks</div>
+  <div class=tools>
+    <button class="btn solid" id=spConnect>● Connect Spotify</button>
+    <button class=btn id=amConnect> Connect Apple Music</button>
+    <input id=ytUrl placeholder="Paste a YouTube / YouTube Music playlist link" aria-label="YouTube playlist link">
+    <button class=btn id=ytLoad>▶ Load YouTube playlist</button>
+  </div>
+  <div class=tools style="margin-top:12px">
+    <select id=plist aria-label="Playlist"><option value="">Choose a playlist…</option></select>
+    <span style="flex:1"></span>
+    <button class=btn id=toSp>⇪ Save Arrange order to Spotify</button><button class=btn id=toAm>⇪ Save to Apple Music</button>
+  </div>
+  <div class=mono id=sstatus style="margin-top:12px"></div>
+  <div style="overflow-x:auto"><table><thead><tr class=mono><th>#</th><th>Track</th><th>Source</th><th>Your analysis</th><th></th></tr></thead><tbody id=sout></tbody></table></div>
+</section>
+</div>
+
+<div class=pbar id=pbar hidden>
+  <span class=key id=psrc></span>
+  <div class=pnow><b id=ptitle></b><small id=partist></small></div>
+  <div class=pctl><button class=btn id=pprev aria-label="Previous">⏮</button><button class="btn solid" id=ptog aria-label="Play or pause">⏯</button><button class=btn id=pnext aria-label="Next">⏭</button></div>
+  <div id=ytbox></div>
 </div>
 
 <script>
@@ -445,6 +478,216 @@ $('csv').onclick = () => {
   download('vibe-check.csv', [cols.join(','), ...ordered().map((t, i) => cols.map(c => q(c == 'n' ? i + 1 : c == 'title' ? title(t) : c == 'dur' ? mmss(t.dur) : t[c])).join(','))].join('\n'), 'text/csv');
 };
 $('m3u').onclick = () => download('vibe-check.m3u', '#EXTM3U\n' + ordered().map(t => `#EXTINF:${Math.round(t.dur)},${t.artist} - ${title(t)}\n${t.path}`).join('\n'), 'audio/x-mpegurl');
+
+
+/* ---------- streaming: Spotify · Apple Music · YouTube ---------- */
+// Fill these in once (see README). Spotify client IDs and restricted YouTube keys are safe in page code.
+const CONFIG = {
+  spotifyClientId: '',
+  youtubeApiKey: '',
+  appleTokenUrl: '/api/apple-token',
+};
+const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const sstatus = s => $('sstatus').textContent = s;
+const fail = (what, e) => { console.warn(what, e); sstatus(`${what}: ${e.message || e}`); };
+const norm = s => (s || '').toLowerCase().replace(/\(.*?\)|\[.*?\]|\bfeat\..*|\bft\..*|original mix|official (music )?video|lyrics?|[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+const matchLocal = it => { const n = norm(it.title); return n && LIB.find(t => { const m = norm(title(t)); return m && (m == n || (Math.min(m.length, n.length) > 3 && (m.includes(n) || n.includes(m)))); }); };
+const PL = new Map(); // playlist key -> {src, name, load()}
+let STRACKS = [];
+
+/* Spotify (PKCE login in the browser, Web Playback SDK needs Premium) */
+const SP_REDIRECT = location.origin + location.pathname;
+const SP_SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative playlist-modify-private';
+const b64url = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+let spTok = get('sp_tok'), spPlayer, spDevice;
+async function spLogin() {
+  if (!CONFIG.spotifyClientId) return sstatus('Add your Spotify Client ID to CONFIG in index.html first (see README)');
+  if (location.protocol == 'file:') return sstatus('Spotify login needs the hosted site (https), not a local file');
+  const v = b64url(crypto.getRandomValues(new Uint8Array(48))); sessionStorage.setItem('sp_v', v);
+  const c = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
+  location = 'https://accounts.spotify.com/authorize?' + new URLSearchParams({client_id: CONFIG.spotifyClientId, response_type: 'code', redirect_uri: SP_REDIRECT, code_challenge_method: 'S256', code_challenge: c, scope: SP_SCOPES});
+}
+async function spToken(body) {
+  const r = await fetch('https://accounts.spotify.com/api/token', {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({client_id: CONFIG.spotifyClientId, ...body})});
+  const j = await r.json(); if (!j.access_token) throw Error(j.error_description || 'login failed');
+  spTok = {a: j.access_token, r: j.refresh_token || spTok?.r, exp: Date.now() + j.expires_in * 1000 - 60000}; put('sp_tok', spTok); return spTok;
+}
+async function sp(path, opt = {}) {
+  if (!spTok) throw Error('not connected');
+  if (Date.now() > spTok.exp) await spToken({grant_type: 'refresh_token', refresh_token: spTok.r});
+  const r = await fetch(path.startsWith('http') ? path : 'https://api.spotify.com/v1' + path, {...opt, headers: {Authorization: 'Bearer ' + spTok.a, 'Content-Type': 'application/json'}});
+  if (r.status == 401) { put('sp_tok', spTok = null); throw Error('session expired, connect again'); }
+  if (!r.ok) throw Error(`Spotify ${r.status} ${(await r.text()).slice(0, 120)}`);
+  return r.status == 204 ? null : r.json().catch(() => null);
+}
+async function spAll(path) { const out = []; for (let u = path; u;) { const j = await sp(u); out.push(...j.items); u = j.next; } return out; }
+async function spConnected() {
+  const lists = await spAll('/me/playlists?limit=50');
+  for (const p of lists) PL.set('sp:' + p.id, {src: 'Spotify', name: p.name, load: async () =>
+    (await spAll(`/playlists/${p.id}/items?limit=100`)).map(x => x.item || x.track).filter(t => t && t.uri)
+      .map(t => ({src: 'spotify', id: t.uri, title: t.name, artist: t.artists.map(a => a.name).join(', '), dur: t.duration_ms / 1000}))});
+  $('spConnect').textContent = '✓ Spotify'; fillPlaylists(); sstatus(`Spotify connected · ${lists.length} playlists`);
+}
+function spReady() {
+  if (spDevice) return Promise.resolve(spDevice);
+  return new Promise((ok, no) => {
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      spPlayer = new Spotify.Player({name: 'Vibe Check', getOAuthToken: cb => (Date.now() > spTok.exp ? spToken({grant_type: 'refresh_token', refresh_token: spTok.r}) : Promise.resolve()).then(() => cb(spTok.a)), volume: 0.8});
+      spPlayer.addListener('ready', ({device_id}) => ok(spDevice = device_id));
+      spPlayer.addListener('account_error', () => no(Error('Spotify playback needs Premium')));
+      spPlayer.addListener('authentication_error', e => no(Error(e.message)));
+      spPlayer.addListener('player_state_changed', s => s && nowPlaying(s.track_window.current_track.name, s.track_window.current_track.artists.map(a => a.name).join(', ')));
+      spPlayer.connect();
+    };
+    script('https://sdk.scdn.co/spotify-player.js').catch(no);
+  });
+}
+$('spConnect').onclick = () => spTok ? spConnected().catch(e => fail('Spotify', e)) : spLogin();
+
+/* Apple Music (MusicKit JS; developer token comes from /api/apple-token) */
+let AM;
+async function amInit() {
+  if (AM) return AM;
+  const r = await fetch(CONFIG.appleTokenUrl); if (!r.ok) throw Error('developer token not set up on the server (see README)');
+  const tok = (await r.text()).trim();
+  if (!window.MusicKit) { const loaded = new Promise(ok => document.addEventListener('musickitloaded', ok, {once: true})); await script('https://js-cdn.music.apple.com/musickit/v3/musickit.js'); if (!window.MusicKit) await loaded; }
+  await MusicKit.configure({developerToken: tok, app: {name: 'Vibe Check', build: '1.0'}});
+  AM = MusicKit.getInstance(); await AM.authorize();
+  AM.addEventListener('nowPlayingItemDidChange', () => AM.nowPlayingItem && nowPlaying(AM.nowPlayingItem.title, AM.nowPlayingItem.artistName));
+  return AM;
+}
+async function amAll(path) { const out = []; for (let u = path; u;) { const j = (await AM.api.music(u)).data; out.push(...j.data); u = j.next; } return out; }
+$('amConnect').onclick = async () => {
+  try {
+    await amInit(); const lists = await amAll('/v1/me/library/playlists?limit=100');
+    for (const p of lists) PL.set('am:' + p.id, {src: 'Apple Music', name: p.attributes.name, load: async () =>
+      (await amAll(`/v1/me/library/playlists/${p.id}/tracks?limit=100`)).filter(t => t.attributes?.playParams)
+        .map(t => ({src: 'apple', id: t.attributes.playParams.catalogId || t.id, title: t.attributes.name, artist: t.attributes.artistName, dur: t.attributes.durationInMillis / 1000}))});
+    $('amConnect').textContent = '✓ Apple Music'; fillPlaylists(); sstatus(`Apple Music connected · ${lists.length} playlists`);
+  } catch (e) { fail('Apple Music', e); }
+};
+
+/* YouTube (public/unlisted playlists via Data API key; playback via the official embedded player) */
+let YT_P, ytReady;
+$('ytLoad').onclick = async () => {
+  const id = ($('ytUrl').value.match(/[?&]list=([\w-]+)/) || [])[1] || $('ytUrl').value.trim();
+  if (!CONFIG.youtubeApiKey) return sstatus('Add your YouTube API key to CONFIG in index.html first (see README)');
+  if (!id) return sstatus('Paste a playlist link containing list=…');
+  try {
+    const out = []; let page = '';
+    do {
+      const j = await (await fetch('https://www.googleapis.com/youtube/v3/playlistItems?' + new URLSearchParams({part: 'snippet', maxResults: 50, playlistId: id, key: CONFIG.youtubeApiKey, pageToken: page}))).json();
+      if (j.error) throw Error(j.error.message); out.push(...j.items); page = j.nextPageToken;
+    } while (page);
+    const items = out.filter(x => x.snippet.resourceId?.videoId).map(x => { const s = x.snippet, [a, t] = s.title.includes(' - ') ? s.title.split(' - ', 2) : [(s.videoOwnerChannelTitle || '').replace(/ - Topic$/, ''), s.title];
+      return {src: 'youtube', id: s.resourceId.videoId, title: t.trim(), artist: a.trim()}; });
+    PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length})`, load: async () => items});
+    fillPlaylists(); $('plist').value = 'yt:' + id; showPlaylist();
+  } catch (e) { fail('YouTube', e); }
+};
+function ytPlayer() {
+  if (ytReady) return ytReady;
+  return ytReady = new Promise(ok => {
+    window.onYouTubeIframeAPIReady = () => { YT_P = new YT.Player('ytbox', {width: 200, height: 200, playerVars: {playsinline: 1}, events: {onReady: ok, onStateChange: e => e.data == 0 && step(1)}}); };
+    script('https://www.youtube.com/iframe_api').catch(e => fail('YouTube player', Error('could not load')));
+  });
+}
+
+/* playlists + table */
+function fillPlaylists() {
+  const groups = {}; for (const [k, p] of PL) (groups[p.src] ||= []).push(`<option value="${esc(k)}">${esc(p.name)}</option>`);
+  const v = $('plist').value;
+  $('plist').innerHTML = '<option value="">Choose a playlist…</option>' + Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
+  $('plist').value = v;
+}
+async function showPlaylist() {
+  const p = PL.get($('plist').value); if (!p) return;
+  sstatus(`Loading ${p.name}…`);
+  try { STRACKS = await p.load(); } catch (e) { return fail(p.src, e); }
+  const hits = STRACKS.map(matchLocal);
+  sstatus(`${STRACKS.length} tracks · ${hits.filter(Boolean).length} matched to your analysed library`);
+  $('sout').innerHTML = STRACKS.map((it, i) => { const t = hits[i];
+    return `<tr><td class=n>${String(i + 1).padStart(2, '0')}</td><td class=t>${esc(it.title)}<small>${esc(it.artist)}</small></td><td class=mono>${it.src}</td>
+      <td class=tr>${t ? `<b>${t.bpm}</b> bpm · <span class=key>${t.key}</span> · energy <b>${t.energy}</b> · dance <b>${t.dance}</b>` : 'not in your library'}</td>
+      <td class=act><button data-i=${i} title="Play from here">▶</button></td></tr>`; }).join('');
+}
+$('plist').onchange = showPlaylist;
+$('sout').onclick = e => { const i = e.target.dataset?.i; if (i != null) play(+i); };
+
+/* one player bar for all three sources */
+let Q = {items: [], i: 0};
+function nowPlaying(t, a) { $('pbar').hidden = false; $('ptitle').textContent = t; $('partist').textContent = a || ''; }
+function stopOthers(src) {
+  if (src != 'spotify') spPlayer?.pause();
+  if (src != 'apple') AM?.pause();
+  if (src != 'youtube') YT_P?.pauseVideo?.();
+  $('ytbox').style.display = src == 'youtube' ? '' : 'none';
+}
+async function play(i, items = STRACKS) {
+  Q = {items, i}; const it = items[i]; if (!it) return;
+  stopOthers(it.src); $('psrc').textContent = it.src; nowPlaying(it.title, it.artist);
+  try {
+    if (it.src == 'spotify') {
+      const dev = await spReady(), rest = items.slice(i, i + 100).filter(x => x.src == 'spotify');
+      await sp(`/me/player/play?device_id=${dev}`, {method: 'PUT', body: JSON.stringify({uris: rest.map(x => x.id)})});
+    } else if (it.src == 'apple') {
+      await AM.setQueue({songs: items.slice(i).filter(x => x.src == 'apple').map(x => x.id), startPlaying: true});
+    } else {
+      await ytPlayer(); YT_P.loadVideoById(it.id);
+    }
+  } catch (e) { fail('Playback', e); }
+}
+function step(d) {
+  const src = Q.items[Q.i]?.src;
+  if (src == 'spotify') return d > 0 ? spPlayer?.nextTrack() : spPlayer?.previousTrack();
+  if (src == 'apple') return d > 0 ? AM?.skipToNextItem() : AM?.skipToPreviousItem();
+  if (Q.items[Q.i + d]) play(Q.i + d, Q.items);
+}
+$('pnext').onclick = () => step(1);
+$('pprev').onclick = () => step(-1);
+$('ptog').onclick = () => {
+  const src = Q.items[Q.i]?.src;
+  if (src == 'spotify') spPlayer?.togglePlay();
+  else if (src == 'apple') AM.isPlaying ? AM.pause() : AM.play();
+  else if (YT_P) YT_P.getPlayerState() == 1 ? YT_P.pauseVideo() : YT_P.playVideo();
+};
+
+/* save the current Arrange order back to a service */
+async function exportTo(which) {
+  const rows = ordered(); if (!rows.length) return sstatus('Nothing in Arrange to save yet');
+  const name = `Vibe Check · ${new Date().toLocaleDateString()}`; let found = [];
+  try {
+    if (which == 'spotify') {
+      if (!spTok) return sstatus('Connect Spotify first');
+      for (const [n, t] of rows.entries()) { sstatus(`Finding on Spotify ${n + 1}/${rows.length}…`);
+        const q = `track:${title(t)}` + (t.artist ? ` artist:${t.artist}` : '');
+        const hit = (await sp('/search?' + new URLSearchParams({q, type: 'track', limit: 1}))).tracks.items[0]; if (hit) found.push(hit.uri); }
+      if (!found.length) return sstatus('None of these tracks were found on Spotify');
+      const pl = await sp('/me/playlists', {method: 'POST', body: JSON.stringify({name, public: false, description: 'Arranged in Vibe Check'})});
+      for (let k = 0; k < found.length; k += 100) await sp(`/playlists/${pl.id}/items`, {method: 'POST', body: JSON.stringify({uris: found.slice(k, k + 100)})});
+    } else {
+      await amInit();
+      for (const [n, t] of rows.entries()) { sstatus(`Finding on Apple Music ${n + 1}/${rows.length}…`);
+        const j = (await AM.api.music(`/v1/catalog/${AM.storefrontId}/search`, {term: `${title(t)} ${t.artist}`.trim(), types: 'songs', limit: 1})).data;
+        const s = j.results?.songs?.data?.[0]; if (s) found.push({id: s.id, type: 'songs'}); }
+      if (!found.length) return sstatus('None of these tracks were found on Apple Music');
+      await AM.api.music('/v1/me/library/playlists', {}, {fetchOptions: {method: 'POST', body: JSON.stringify({attributes: {name, description: 'Arranged in Vibe Check'}, relationships: {tracks: {data: found}}})}});
+    }
+    sstatus(`Saved “${name}” · ${found.length} of ${rows.length} tracks found`);
+  } catch (e) { fail('Save playlist', e); }
+}
+$('toSp').onclick = () => exportTo('spotify');
+$('toAm').onclick = () => exportTo('apple');
+
+/* finish a Spotify login redirect, or reconnect a saved session */
+(async () => {
+  const code = new URLSearchParams(location.search).get('code');
+  try {
+    if (code) { await spToken({grant_type: 'authorization_code', code, redirect_uri: SP_REDIRECT, code_verifier: sessionStorage.getItem('sp_v')}); history.replaceState(null, '', SP_REDIRECT); }
+    if (spTok) await spConnected();
+  } catch (e) { fail('Spotify', e); }
+})();
 
 rebuild();
 </script>
