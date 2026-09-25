@@ -108,6 +108,10 @@ audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 body:has(.pbar:not([hidden])){padding-bottom:240px}
 #ytUrl{flex:1;min-width:220px;font:14px Inter,system-ui,sans-serif;background:var(--panel);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:9px 12px}
 #sout .act button{font:700 14px 'JetBrains Mono',monospace;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
+.wave{width:100%;height:70px;display:block;background:var(--well);border-radius:8px}
+.spark{margin:16px 0 0}.spark figcaption{margin-bottom:4px}.spark svg{width:100%;height:auto;overflow:visible}.spark text{font:500 11px 'JetBrains Mono',monospace;fill:var(--dim)}.spark .grid{stroke:var(--edge);stroke-width:1}
+.dup{font:700 10px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#c0392b;border:1px solid currentColor;border-radius:4px;padding:0 4px}
+#base{flex:1;min-width:240px;font:14px Inter,system-ui,sans-serif;background:var(--panel);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:9px 12px}
 </style>
 
 <div class=wrap>
@@ -157,11 +161,13 @@ body:has(.pbar:not([hidden])){padding-bottom:240px}
   <div class="rule mono" id=sub></div>
   <div class=tools>
     <div class=seg id=modes><button data-m=match>Taste match</button><button data-m=mix>Mix path</button><button data-m=sort>Sorted</button><button data-m=custom>Custom</button></div>
-    <select id=curve title="Energy curve for mix path"><option value=rise>Energy ↗ build</option><option value=fall>Energy ↘ cool down</option><option value=wave>Energy ∿ waves</option><option value=flat>Energy → hold target</option></select>
+    <select id=tagf title="Filter by tag"><option value="">All tags</option></select><select id=curve title="Energy curve for mix path"><option value=rise>Energy ↗ build</option><option value=fall>Energy ↘ cool down</option><option value=wave>Energy ∿ waves</option><option value=flat>Energy → hold target</option></select>
     <select id=sortby title="Sort by any factor"><option value="">Sort by…</option><option value=energy>Energy</option><option value=dance>Danceability</option><option value=happy>Happiness</option><option value=acoustic>Acousticness</option><option value=instr>Instrumental</option><option value=bpm>BPM</option><option value=key>Key (Camelot)</option><option value=loud>Loudness</option><option value=bright>Brightness</option><option value=busy>Busyness</option><option value=dyn>Dynamics</option><option value=dur>Duration</option><option value=name>Title</option></select><button class=btn id=sdir title="Flip sort direction">↑↓</button>
     <span style="flex:1"></span>
-    <button class=btn id=csv>⇩ CSV</button><button class=btn id=m3u>⇩ Playlist .m3u</button>
+    <button class=btn id=csv>⇩ CSV</button><button class=btn id=m3u>⇩ Traktor / Rekordbox .m3u8</button>
   </div>
+  <div class=tools style="margin-top:12px"><input id=base placeholder="Playlist paths start at, e.g. /Users/you/Music" aria-label="Base folder for playlist export"></div>
+  <div id=setchart></div>
   <div class="mono" style="margin-top:12px;letter-spacing:.12em">Click a column to sort · drag rows to arrange by hand · click a title for full analysis</div>
   <div style="overflow-x:auto"><table><thead><tr class=mono>
     <th>#</th><th class=s data-k=name>Track</th><th class=s data-k=bpm>BPM</th><th class=s data-k=key>Key</th>
@@ -210,7 +216,7 @@ const cam = s => [+s.slice(0, -1), s.slice(-1)];
 const compat = (a, b) => { const [n, l] = cam(a), [m, k] = cam(b), d = (n - m + 12) % 12; return n == m || (l == k && (d == 1 || d == 11)); };
 const title = t => t.file.replace(/\.[^.]+$/, '').replace(/^\d+\s*[-.]?\s+/, '').replace(/^YTDown\.com_YouTube_|_Media_.*$/g, '').replace(/_/g, ' ').split(' - ').pop().replace(/^([^ ]*)$/, x => x.replace(/-/g, ' '));
 
-let LIB = []; try { LIB = JSON.parse(localStorage.getItem('vibecheck') || '[]').filter(t => t.v == 2); } catch {}
+let LIB = []; try { LIB = JSON.parse(localStorage.getItem('vibecheck') || '[]').filter(t => t.v == 3); } catch {}
 const save = () => { try { localStorage.setItem('vibecheck', JSON.stringify(LIB)); } catch {} };
 const FILES = new Map(), URLS = new Map();
 const R = {}, T = {}, W = {}, el = {};
@@ -221,84 +227,141 @@ const root = document.documentElement;
 root.dataset.theme ||= matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 $('theme').onclick = () => root.dataset.theme = root.dataset.theme == 'dark' ? 'light' : 'dark';
 
-/* ---------- analysis (Essentia.js, in-browser) ---------- */
-let E, ac;
-async function engine() {
-  if (!E) { const [w, c] = await Promise.all([import(ESS + 'essentia-wasm.es.js'), import(ESS + 'essentia.js-core.es.js')]); E = new c.default(w.EssentiaWASM); }
-  return E;
-}
-/* ---------- AI models (Essentia, trained on public MSD / Last.fm data) ---------- */
+let ac;
+const script = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.append(s); });
+/* ---------- analysis runs in background workers (Essentia DSP + AI models trained on public MSD / Last.fm data) ---------- */
+const TFJS = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.5.0/dist/', TFW = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.5.0/dist/';
+const WORKER_SRC = `
+self.exports = {};
+const ESS = ${JSON.stringify(ESS)}, TFJS = ${JSON.stringify(TFJS)}, TFW = ${JSON.stringify(TFW)};
 const GH = 'https://cdn.jsdelivr.net/gh/MTG/essentia.js@819c00e8f034dc709e3d330ed8ac9ed37dfdb767/examples/';
 const MODELS = {dance: 'demos/mood-classifiers/models/danceability-musicnn-msd-2', happy: 'demos/mood-classifiers/models/mood_happy-musicnn-msd-2',
   aggr: 'demos/mood-classifiers/models/mood_aggressive-musicnn-msd-2', relax: 'demos/mood-classifiers/models/mood_relaxed-musicnn-msd-2',
   tags: 'starter-code/autotagging/models/msd-musicnn-1'};
-// msd-musicnn-1 output order: 23 instrumental · 29 acoustic · 4 electronic · 18 electronica · 41 electro · 48 house · 6 dance · 5/13/31 vocalists
-const TAG = {instr: 23, acoustic: 29, vocals: [5, 13, 31], electronic: [4, 18, 41, 48, 6]};
+const TAGS = ${JSON.stringify(["rock","pop","alternative","indie","electronic","female vocalists","dance","2000s","alternative rock","jazz","beautiful","metal","chillout","male vocalists","classic rock","soul","indie rock","mellow","electronica","80s","folk","90s","chill","instrumental","punk","oldies","blues","hard rock","ambient","acoustic","experimental","female vocalist","guitar","hip-hop","70s","party","country","easy listening","sexy","catchy","funk","electro","heavy metal","progressive rock","60s","rnb","indie pop","sad","house","happy"])};
+const SKIP = new Set(['2000s','80s','90s','70s','60s','oldies','female vocalist','beautiful','catchy','sexy','instrumental','male vocalists','female vocalists','acoustic']);
+importScripts(ESS + 'essentia-wasm.umd.js', ESS + 'essentia.js-core.umd.js', ESS + 'essentia.js-model.umd.js');
+const W = exports.EssentiaWASM, E = new Essentia(W);
+const clamp = x => Math.max(0, Math.min(1, x));
 let ML;
-const script = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.append(s); });
 async function ml() {
   if (ML !== undefined) return ML;
   try {
-    if (!window.tf) await script('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.5.0/dist/tf.min.js');
-    await tf.ready();
-    if (tf.getBackend() != 'webgl') { // no GPU: WASM backend is ~10x faster than plain CPU
-      const W = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.5.0/dist/';
-      await script(W + 'tf-backend-wasm.min.js'); tf.wasm.setWasmPaths(W); await tf.setBackend('wasm');
-    }
-    const [w, m] = await Promise.all([import(ESS + 'essentia-wasm.es.js'), import(ESS + 'essentia.js-model.es.js')]);
-    const models = Object.fromEntries(Object.entries(MODELS).map(([k, p]) => [k, new m.TensorflowMusiCNN(tf, GH + p + '/model.json')]));
+    importScripts(TFJS + 'tf.min.js'); await tf.ready();
+    if (tf.getBackend() != 'webgl') { importScripts(TFW + 'tf-backend-wasm.min.js'); tf.wasm.setWasmPaths(TFW); await tf.setBackend('wasm'); }
+    const models = Object.fromEntries(Object.entries(MODELS).map(([k, p]) => [k, new EssentiaModel.TensorflowMusiCNN(tf, GH + p + '/model.json')]));
     await Promise.all(Object.values(models).map(x => x.initialize()));
-    ML = {ext: new m.EssentiaTFInputExtractor(w.EssentiaWASM, 'musicnn'), models};
+    ML = {ext: new EssentiaModel.EssentiaTFInputExtractor(W, 'musicnn'), models};
   } catch (e) { console.warn('AI models unavailable, using signal-only estimates', e); ML = null; }
   return ML;
 }
 const colMeans = rows => rows[0].map((_, j) => rows.reduce((s, r) => s + r[j], 0) / rows.length);
-async function mlFeatures(buf) {
+async function aiFeatures(a16) {
   const M = await ml(); if (!M) return null;
-  // ponytail: 30 s centre window at 16 kHz (10 model patches); widen if short intros skew results
-  const len = Math.min(buf.duration, 30), off = new OfflineAudioContext(1, Math.ceil(len * 16000), 16000), src = off.createBufferSource();
-  src.buffer = buf; src.connect(off.destination); src.start(0, (buf.duration - len) / 2, len);
-  const feats = M.ext.computeFrameWise((await off.startRendering()).getChannelData(0), 256), p = {};
+  const feats = M.ext.computeFrameWise(a16, 256), p = {};
   for (const k in M.models) p[k] = colMeans(await M.models[k].predict(feats, true));
-  const t = p.tags, sum = ix => ix.reduce((s, i) => s + t[i], 0);
+  const t = p.tags, sum = ix => ix.reduce((s, i) => s + t[i], 0), VOC = [5, 13, 31], ELEC = [4, 18, 41, 48, 6];
   return {
     dance: p.dance[0], happy: p.happy[0], aggr: p.aggr[0], relax: p.relax[1],
-    instr: t[TAG.instr] / (t[TAG.instr] + sum(TAG.vocals) + 1e-6),
-    acoustic: t[TAG.acoustic] / (t[TAG.acoustic] + sum(TAG.electronic) + 1e-6),
-    electronic: sum(TAG.electronic) / (sum(TAG.electronic) + t[TAG.acoustic] + sum(TAG.vocals) * 0.5 + 1e-6),
+    instr: t[23] / (t[23] + sum(VOC) + 1e-6), acoustic: t[29] / (t[29] + sum(ELEC) + 1e-6),
+    electronic: sum(ELEC) / (sum(ELEC) + t[29] + sum(VOC) * 0.5 + 1e-6),
+    tags: TAGS.map((n, i) => [n, t[i]]).filter(([n, v]) => !SKIP.has(n) && v > 0.1).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]),
   };
 }
-
-async function analyze(f) {
-  ac ||= new AudioContext();
-  const buf = await ac.decodeAudioData(await f.arrayBuffer());
-  const m = await mlFeatures(buf);
-  // ponytail: analyses the middle 2 min for speed; full-length if accuracy on long mixes matters
-  const dur = buf.duration, len = Math.min(dur, 120);
-  const off = new OfflineAudioContext(1, Math.ceil(len * 44100), 44100), src = off.createBufferSource();
-  src.buffer = buf; src.connect(off.destination); src.start(0, (dur - len) / 2, len);
-  const a = (await off.startRendering()).getChannelData(0);
-  const e = await engine(), v = e.arrayToVector(a);
+async function analyse(a44, a16) {
+  const m = await aiFeatures(a16), v = E.arrayToVector(a44);
   try {
-    // EDMA key profile (Faraldo, tuned on the public GiantSteps EDM set) for electronic tracks, Temperley/bgate otherwise
-    const k = e.KeyExtractor(v, true, 4096, 4096, 12, 3500, 60, 25, 0.2, m && m.electronic > 0.5 ? 'edma' : 'bgate');
-    let bpm = e.RhythmExtractor2013(v).bpm; if (bpm < 70) bpm *= 2; else if (bpm > 190) bpm /= 2;
-    const dfa = e.Danceability(v).danceability;
-    const dc = e.DynamicComplexity(v), rate = e.OnsetRate(v).onsetRate, bright = e.SpectralCentroidTime(v, 44100).centroid;
-    const path = f.webkitRelativePath || f._path || f.name, seg = path.split('/');
-    const loud = dc.loudness, sig = 0.5 * clamp((loud + 30) / 25) + 0.3 * clamp(rate / 8) + 0.2 * clamp((bright - 1000) / 4000);
-    const pct = x => Math.round(100 * clamp(x));
+    // EDMA key profile (Faraldo, tuned on the public GiantSteps EDM set) for electronic tracks, bgate otherwise
+    const k = E.KeyExtractor(v, true, 4096, 4096, 12, 3500, 60, 25, 0.2, m && m.electronic > 0.5 ? 'edma' : 'bgate');
+    let bpm = E.RhythmExtractor2013(v).bpm; if (bpm < 70) bpm *= 2; else if (bpm > 190) bpm /= 2;
+    const dfa = E.Danceability(v).danceability, dc = E.DynamicComplexity(v), rate = E.OnsetRate(v).onsetRate, bright = E.SpectralCentroidTime(v, 44100).centroid;
+    const loud = dc.loudness, sig = 0.5 * clamp((loud + 30) / 25) + 0.3 * clamp(rate / 8) + 0.2 * clamp((bright - 1000) / 4000), pct = x => Math.round(100 * clamp(x));
     return {
-      v: 2, ai: !!m, id: f.name + '|' + f.size, file: f.name, path, dur,
-      artist: f.name.includes(' - ') ? f.name.split(' - ')[0].replace(/^\d+\s*/, '') : (seg.at(-3) || seg.at(-2) || ''),
-      key: camelot(k.key, k.scale), keyName: `${k.key} ${k.scale}`, bpm: +bpm.toFixed(1),
-      loud: +loud.toFixed(1), dyn: +dc.dynamicComplexity.toFixed(2), bright: Math.round(bright), busy: +rate.toFixed(2),
-      // AI where available, signal heuristics as fallback; blends keep rhythm/loudness physics in the score
+      ai: !!m, k: k.key, scale: k.scale, bpm: +bpm.toFixed(1), loud: +loud.toFixed(1), dyn: +dc.dynamicComplexity.toFixed(2), bright: Math.round(bright), busy: +rate.toFixed(2),
       dance: pct(m ? 0.7 * m.dance + 0.3 * dfa / 2 : dfa / 2),
       energy: pct(m ? 0.35 * m.aggr + 0.25 * (1 - m.relax) + 0.4 * sig : sig),
-      happy: m ? pct(m.happy) : null, acoustic: m ? pct(m.acoustic) : null, instr: m ? pct(m.instr) : null,
+      happy: m ? pct(m.happy) : null, acoustic: m ? pct(m.acoustic) : null, instr: m ? pct(m.instr) : null, tags: m ? m.tags : [],
     };
   } finally { v.delete(); }
+}
+onmessage = async ({data: {id, a44, a16}}) => { try { postMessage({id, r: await analyse(a44, a16)}); } catch (e) { postMessage({id, err: String(e && e.message || e)}); } };
+`;
+// ponytail: 2 workers (each holds its own ~16 MB of models); raise if machines have RAM to spare
+const POOL = Array.from({length: Math.min(2, Math.max(1, (navigator.hardwareConcurrency || 2) - 1))}, () => {
+  const w = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], {type: 'text/javascript'}))), jobs = new Map();
+  w.onmessage = ({data}) => { const j = jobs.get(data.id); jobs.delete(data.id); data.err ? j.no(Error(data.err)) : j.ok(data.r); };
+  w.onerror = e => { for (const j of jobs.values()) j.no(Error(e.message || 'analysis worker crashed')); jobs.clear(); };
+  return {w, jobs};
+});
+let jobId = 0;
+function inWorker(a44, a16) {
+  const slot = POOL.reduce((a, b) => a.jobs.size <= b.jobs.size ? a : b), id = ++jobId;
+  return new Promise((ok, no) => { slot.jobs.set(id, {ok, no}); slot.w.postMessage({id, a44, a16}, [a44.buffer, a16.buffer]); });
+}
+
+/* file tags: Mixed In Key / Traktor / Rekordbox write the key (and MIK its energy) into the file */
+const NAME = {}; for (const k of ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B']) for (const s of ['major', 'minor']) NAME[camelot(k, s)] = `${k} ${s}`;
+function tagKey(s) {
+  s = String(s || '').trim(); let m;
+  if ((m = s.match(/^(\d{1,2})([AB])\b/i)) && +m[1] >= 1 && +m[1] <= 12) return +m[1] + m[2].toUpperCase();
+  if ((m = s.match(/^(\d{1,2})([dm])$/i)) && +m[1] >= 1 && +m[1] <= 12) return (((+m[1] + 6) % 12) + 1) + (m[2].toLowerCase() == 'd' ? 'B' : 'A'); // Open Key
+  if ((m = s.match(/^([A-G])([#b]?)\s*(m|min|minor|maj|major)?$/i))) {
+    const k = m[1].toUpperCase() + (m[2] || ''); if (PC[k] == null) return null;
+    return camelot(k, /^m(in(or)?)?$/i.test(m[3] || '') ? 'minor' : 'major');
+  }
+  return null;
+}
+async function readTags(f) {
+  if (!/\.(mp3|m4a|aac|flac)$/i.test(f.name)) return {};
+  try {
+    if (!window.jsmediatags) await script('https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js');
+    const {tags} = await new Promise((ok, no) => jsmediatags.read(f, {onSuccess: ok, onError: no}));
+    const txt = x => typeof x == 'string' ? x : x?.text || x?.data?.text || x?.data || '';
+    const comment = txt(tags.comment) || txt(tags.COMM);
+    const key = tagKey(txt(tags.TKEY)) || tagKey(txt(tags.initialkey)) || tagKey(comment);
+    const e = comment.match(/^\s*\d{1,2}[AB]\s*-\s*(?:Energy\s*)?(\d{1,2})\b/i);
+    return {key, mikEnergy: e ? +e[1] : null};
+  } catch { return {}; }
+}
+
+/* energy shape over the whole track: full-band waveform + kick/bass band for intro, breakdowns and outro */
+function sections(bass, dur) {
+  const N = bass.length, ref = [...bass].sort((a, b) => a - b)[Math.floor(N * 0.9)] || 1, hi = bass.map(v => v >= 0.55 * ref);
+  const minRun = Math.max(2, Math.ceil(8 * N / dur)), t = i => +(i * dur / N).toFixed(1); // breakdowns shorter than 8 s are ignored
+  let a = hi.findIndex((v, i) => v && hi[i + 1] && hi[i + 2]); if (a < 0) a = 0;
+  let z = N - 1; while (z > 2 && !(hi[z] && hi[z - 1] && hi[z - 2])) z--;
+  const breaks = [];
+  for (let i = a; i < z;) { if (hi[i]) { i++; continue; } let j = i; while (j < z && !hi[j]) j++; if (j - i >= minRun) breaks.push([t(i), t(j)]); i = j; }
+  return {intro: t(a), outro: +Math.max(0, dur - t(z + 1)).toFixed(1), breaks};
+}
+async function shape(buf) {
+  const N = 200, sr = 3000, off = new OfflineAudioContext(2, Math.ceil(buf.duration * sr), sr), src = off.createBufferSource();
+  const lp = off.createBiquadFilter(), merge = off.createChannelMerger(2);
+  lp.type = 'lowpass'; lp.frequency.value = 150; src.buffer = buf;
+  src.connect(merge, 0, 0); src.connect(lp); lp.connect(merge, 0, 1); merge.connect(off.destination); src.start();
+  const r = await off.startRendering(), rms = ch => { const d = r.getChannelData(ch), n = Math.floor(d.length / N);
+    return Array.from({length: N}, (_, i) => { let s = 0; for (let j = i * n; j < (i + 1) * n; j++) s += d[j] * d[j]; return Math.sqrt(s / (n || 1)); }); };
+  const full = rms(0), bass = rms(1), mx = Math.max(...full) || 1;
+  return {wave: full.map(v => Math.round(100 * v / mx)), ...sections(bass, buf.duration)};
+}
+
+async function render1(buf, sr, sec) {
+  const len = Math.min(buf.duration, sec), off = new OfflineAudioContext(1, Math.ceil(len * sr), sr), src = off.createBufferSource();
+  src.buffer = buf; src.connect(off.destination); src.start(0, (buf.duration - len) / 2, len);
+  return (await off.startRendering()).getChannelData(0);
+}
+async function analyze(f) {
+  ac ||= new AudioContext();
+  const [buf, tag] = await Promise.all([f.arrayBuffer().then(b => ac.decodeAudioData(b)), readTags(f)]);
+  // ponytail: middle 2 min for DSP, middle 30 s for the AI models; widen if long intros skew results
+  const [a44, a16, sh] = await Promise.all([render1(buf, 44100, 120), render1(buf, 16000, 30), shape(buf)]);
+  const r = await inWorker(a44, a16), aiKey = camelot(r.k, r.scale);
+  const path = f.webkitRelativePath || f._path || f.name, seg = path.split('/'), key = tag.key || aiKey;
+  return {
+    v: 3, id: f.name + '|' + f.size, file: f.name, path, dur: buf.duration,
+    artist: f.name.includes(' - ') ? f.name.split(' - ')[0].replace(/^\d+\s*/, '') : (seg.at(-3) || seg.at(-2) || ''),
+    ...r, k: undefined, scale: undefined, key, keyName: NAME[key] || key, keySrc: tag.key ? 'tag' : 'ai', aiKey, mikEnergy: tag.mikEnergy ?? null, ...sh,
+  };
 }
 
 /* ---------- bulk loading ---------- */
@@ -311,16 +374,17 @@ async function load(files) {
   files = files.filter(f => AUDIO.test(f.name));
   if (!files.length || busy) return status(busy ? 'Already analysing — wait for this batch' : 'No audio files found');
   busy = true; $('prog').style.display = 'block'; spin(0.5);
-  let done = 0, fails = 0;
-  for (const f of files) {
-    const id = f.name + '|' + f.size; FILES.set(id, f);
+  let done = 0, fails = 0, next = 0;
+  const runner = async () => { while (next < files.length) {
+    const f = files[next++], id = f.name + '|' + f.size; FILES.set(id, f);
     status(`Analysing ${done + 1}/${files.length} · ${f.name}`);
     if (!LIB.some(t => t.id == id)) {
       try { LIB.push(await analyze(f)); save(); } catch (e) { fails++; console.warn(f.name, e); }
     }
     $('prog').firstChild.style.width = (100 * ++done / files.length) + '%';
-    if (done % 5 == 0 || done == files.length) { rebuild(); }
-  }
+    if (done % 5 == 0 || done == files.length) rebuild();
+  } };
+  await Promise.all(POOL.map(runner));
   busy = false; setTimeout(() => $('prog').style.display = 'none', 600);
   status(`Done · ${files.length - fails} tracks ready${fails ? ` · ${fails} couldn't be decoded` : ''} · library ${LIB.length}`);
   rebuild();
@@ -392,7 +456,7 @@ function mixPath(list) {
   return out;
 }
 function ordered() {
-  const list = LIB.filter(t => !$('harm').checked || !ref || compat(t.key, ref.key));
+  const tf = $('tagf').value, list = LIB.filter(t => (!$('harm').checked || !ref || compat(t.key, ref.key)) && (!tf || (tf == '__dup' ? DUPS.has(t.id) : t.tags?.includes(tf))));
   if (mode == 'mix') return mixPath(list);
   if (mode == 'sort') return [...list].sort((a, b) => { const x = sortVal(a, sortKey), y = sortVal(b, sortKey); return (x > y) - (x < y) || 0; }).map((t, i, a) => sortDir > 0 ? t : a[a.length - 1 - i]);
   if (mode == 'custom') { const byId = new Map(list.map(t => [t.id, t])), seen = custom.map(id => byId.get(id)).filter(Boolean); return [...seen, ...list.filter(t => !seen.includes(t))]; }
@@ -421,7 +485,8 @@ function ring(label, frac, text) {
 function detail(t) {
   const f = FILES.get(t.id); if (f && !URLS.has(t.id)) URLS.set(t.id, URL.createObjectURL(f));
   return `<tr class=detail><td colspan=11>
-    <div class=tiles><div><b>${esc(t.keyName)}</b><span class=mono>Key</span></div><div><b>${t.key}</b><span class=mono>Camelot</span></div><div><b>${Math.round(t.bpm)}</b><span class=mono>BPM</span></div><div><b>${mmss(t.dur)}</b><span class=mono>Duration</span></div></div>
+    <div class=tiles><div><b>${esc(t.keyName)}</b><span class=mono>Key</span></div><div><b>${t.key}</b><span class=mono>Camelot</span></div><div><b>${Math.round(t.bpm)}</b><span class=mono>BPM</span></div><div><b>${mmss(t.dur)}</b><span class=mono>Duration</span></div><div><b>${mmss(t.intro)}</b><span class=mono>Intro</span></div><div><b>${mmss(t.outro)}</b><span class=mono>Outro</span></div>${t.mikEnergy != null ? `<div><b>${t.mikEnergy}</b><span class=mono>MIK energy</span></div>` : ''}</div>
+    <div class=mono style="margin:-6px 0 14px">Key ${t.keySrc == 'tag' ? `from file tag · Vibe Check detected ${t.aiKey}` : 'detected by Vibe Check'}</div>${wave(t)}
     <div class=rings>${ring('Danceability', t.dance / 100, t.dance)}${ring('Energy', t.energy / 100, t.energy)}${t.ai ? ring('Happiness', t.happy / 100, t.happy) + ring('Acoustic', t.acoustic / 100, t.acoustic) + ring('Instrumental', t.instr / 100, t.instr) : ''}${ring('Loudness', (t.loud + 30) / 25, t.loud)}${ring('Brightness', (t.bright - 1000) / 4000, (t.bright / 1000).toFixed(1) + 'k')}${ring('Busyness', t.busy / 8, t.busy)}${ring('Dynamics', t.dyn / 10, t.dyn)}</div>
     ${URLS.has(t.id) ? `<audio controls src="${URLS.get(t.id)}"></audio>` : `<div class=mono style="margin-top:14px">Re-add the file this session to preview it here</div>`}
     <div class=mono style="margin-top:10px;letter-spacing:.1em">${esc(t.path)}</div></td></tr>`;
@@ -430,21 +495,59 @@ function render() {
   document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.m == mode));
   $('sortby').value = mode == 'sort' ? sortKey : ''; document.querySelectorAll('th.s').forEach(th => { th.classList.toggle('on', mode == 'sort' && th.dataset.k == sortKey); });
   if (!LIB.length) { $('sub').textContent = 'Empty library'; $('out').innerHTML = '<tr><td colspan=11 class="empty mono">No tapes loaded yet · drop a folder above</td></tr>'; deck(); return; }
-  deck();
-  const rows = ordered();
+  deck(); findDups(); fillTags();
+  const rows = ordered(); setChart(rows);
   $('sub').textContent = `${rows.length} of ${LIB.length} tracks · ${{match: 'closest to your taste first', mix: 'DJ order: key-compatible, small BPM jumps, following the energy curve', sort: `sorted by ${sortKey} ${sortDir > 0 ? '↑' : '↓'}`, custom: 'your hand-arranged order'}[mode]}`;
   $('out').innerHTML = rows.map((t, n) => {
     const p = rows[n - 1], db = p ? t.bpm - p.bpm : 0;
     const tr = p ? `<span class=tr><b>${db >= 0 ? '+' : ''}${db.toFixed(1)}</b> bpm · ${compat(t.key, p.key) ? '<b>✓</b> key' : '<span class=bad>✗ key</span>'}</span>` : '<span class=tr>start</span>';
     return `<tr draggable=true data-id="${esc(t.id)}" class="${t === ref ? 'ref' : ''}">
       <td class=n>${String(n + 1).padStart(2, '0')}</td>
-      <td class=t data-act=open>${esc(title(t))}<small>${t.artist ? esc(t.artist) + ' · ' : ''}${mmss(t.dur)}</small></td>
-      <td class=m>${t.bpm}</td><td><span class=key>${t.key}</span></td>
+      <td class=t data-act=open>${esc(title(t))}<small>${t.artist ? esc(t.artist) + ' · ' : ''}${mmss(t.dur)}${t.tags?.length ? ' · ' + esc(t.tags.join(', ')) : ''}${DUPS.has(t.id) ? ' <span class=dup>duplicate</span>' : ''}</small></td>
+      <td class=m>${t.bpm}</td><td><span class=key title="${t.keySrc == 'tag' ? 'From the file tag (e.g. Mixed In Key)' : 'Detected by Vibe Check'}">${t.key}${t.keySrc == 'tag' ? '•' : ''}</span></td>
       <td class="m hide">${t.dance}</td><td class="m hide">${t.energy}</td><td class="m hide">${t.happy ?? "–"}</td><td class="m hide">${t.loud}</td>
       <td>${vu(Math.max(0, Math.round(100 * (1 - dist(t)))))}</td><td>${tr}</td>
       <td class=act><button data-act=like title="More like this / start mix here">≈</button> <a target=_blank href="https://tunebat.com/Search?q=${encodeURIComponent(title(t))}" title="Find similar online">↗</a> <button class=x data-act=del title="Remove from library">✕</button></td></tr>${open == t.id ? detail(t) : ''}`;
   }).join('');
 }
+
+/* ---------- duplicates, tags, waveform, set chart ---------- */
+let DUPS = new Set();
+function findDups() {
+  DUPS = new Set(); const seen = new Map();
+  for (const t of LIB) {
+    const k = norm(title(t)) + '|' + norm(t.artist);
+    for (const o of seen.get(k) || []) if (Math.abs(o.dur - t.dur) < 3) { DUPS.add(o.id); DUPS.add(t.id); }
+    seen.set(k, [...(seen.get(k) || []), t]);
+  }
+}
+function fillTags() {
+  const v = $('tagf').value, all = [...new Set(LIB.flatMap(t => t.tags || []))].sort();
+  $('tagf').innerHTML = '<option value="">All tags</option>' + all.map(x => `<option>${esc(x)}</option>`).join('') + (DUPS.size ? `<option value="__dup">Duplicates (${DUPS.size})</option>` : '');
+  $('tagf').value = [...$('tagf').options].some(o => o.value == v) ? v : '';
+}
+$('tagf').onchange = () => render();
+function wave(t) {
+  if (!t.wave) return '';
+  const N = t.wave.length, x = s => (s / t.dur) * N;
+  const brk = t.breaks.map(([a, b]) => `<rect x="${x(a)}" y="0" width="${x(b) - x(a)}" height="40" fill="var(--acc)" opacity=".14"/>`).join('');
+  const bars = t.wave.map((v, i) => `<rect x="${i + 0.15}" y="${20 - v * 0.19}" width=".7" height="${Math.max(0.4, v * 0.38)}" fill="var(--gold)"/>`).join('');
+  const line = (s, lbl) => `<line x1="${x(s)}" x2="${x(s)}" y1="0" y2="40" stroke="var(--acc)" stroke-width=".4"><title>${lbl}</title></line>`;
+  const brkTxt = t.breaks.length ? ' · breakdowns ' + t.breaks.map(([a, b]) => `${mmss(a)}–${mmss(b)}`).join(', ') : '';
+  return `<svg class=wave viewBox="0 0 ${N} 40" preserveAspectRatio="none" role="img" aria-label="Waveform">${brk}${bars}${line(t.intro, 'Intro ends ' + mmss(t.intro))}${line(t.dur - t.outro, 'Outro starts ' + mmss(t.dur - t.outro))}</svg>
+    <div class=mono style="margin:6px 0 16px;letter-spacing:.1em">Mix in over ${mmss(t.intro)} · mix out over the last ${mmss(t.outro)}${brkTxt}</div>`;
+}
+function spark(rows, key, label, color) {
+  const v = rows.map(t => t[key]), lo = Math.min(...v), hi = Math.max(...v), W = 600, H = 70, L = 34, pad = (hi - lo) * 0.1 || 1;
+  const X = i => L + (rows.length > 1 ? i * (W - L - 8) / (rows.length - 1) : 0), Y = y => 6 + (H - 12) * (1 - (y - lo + pad) / (hi - lo + 2 * pad));
+  const pts = v.map((y, i) => `${X(i).toFixed(1)},${Y(y).toFixed(1)}`).join(' ');
+  return `<figure class=spark><figcaption class=mono>${label} across the set</figcaption><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${label} across the set">
+    <line x1="${L}" x2="${W}" y1="${Y(hi)}" y2="${Y(hi)}" class=grid /><line x1="${L}" x2="${W}" y1="${Y(lo)}" y2="${Y(lo)}" class=grid />
+    <text x="${L - 6}" y="${Y(hi) + 4}" text-anchor=end>${Math.round(hi)}</text><text x="${L - 6}" y="${Y(lo) + 4}" text-anchor=end>${Math.round(lo)}</text>
+    <polyline points="${pts}" fill=none stroke="${color}" stroke-width=2 stroke-linejoin=round />
+    ${v.map((y, i) => `<circle cx="${X(i)}" cy="${Y(y)}" r=4 fill="${color}" stroke="var(--panel)" stroke-width=2><title>${String(i + 1).padStart(2, '0')} ${esc(title(rows[i]))}: ${y}</title></circle>`).join('')}</svg></figure>`;
+}
+function setChart(rows) { $('setchart').innerHTML = rows.length > 1 ? spark(rows, 'energy', 'Energy', 'var(--acc)') + spark(rows, 'bpm', 'BPM', 'var(--gold)') : ''; }
 
 /* ---------- row actions + drag arrange ---------- */
 const out = $('out');
@@ -477,7 +580,12 @@ $('csv').onclick = () => {
   const q = v => `"${String(v).replace(/"/g, '""')}"`;
   download('vibe-check.csv', [cols.join(','), ...ordered().map((t, i) => cols.map(c => q(c == 'n' ? i + 1 : c == 'title' ? title(t) : c == 'dur' ? mmss(t.dur) : t[c])).join(','))].join('\n'), 'text/csv');
 };
-$('m3u').onclick = () => download('vibe-check.m3u', '#EXTM3U\n' + ordered().map(t => `#EXTINF:${Math.round(t.dur)},${t.artist} - ${title(t)}\n${t.path}`).join('\n'), 'audio/x-mpegurl');
+$('m3u').onclick = () => {
+  const base = $('base').value.trim().replace(/\/+$/, ''); try { localStorage.setItem('vc_base', base); } catch {}
+  if (!base) return status('Type the folder that contains what you dropped (e.g. /Users/you/Music) so Traktor and Rekordbox can find the files');
+  download('vibe-check.m3u8', '#EXTM3U\n' + ordered().map(t => `#EXTINF:${Math.round(t.dur)},${t.artist ? t.artist + " - " : ""}${title(t)}\n${base}/${t.path}`).join('\n') + '\n', 'audio/x-mpegurl');
+};
+try { $('base').value = localStorage.getItem('vc_base') || ''; } catch {}
 
 
 /* ---------- streaming: Spotify · Apple Music · YouTube ---------- */

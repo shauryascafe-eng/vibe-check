@@ -7,3 +7,4 @@ tracks.js
 .vercel
 .env*
 *.bak
+.mik_truth.tsv
