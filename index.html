@@ -1569,7 +1569,7 @@ $('ytLoad').onclick = async () => {
   sstatus('Reading YouTube playlist…');
   try {
     const r = await fetch('/api/yt?list=' + id), j = await r.json().catch(() => ({}));
-    if (!r.ok) throw Error(j.error || r.status);
+    if (!r.ok) throw Error((j.error || r.status) + (j.tried ? ` [${j.tried.join(' · ')}]` : ''));
     const items = j.items.map(x => ({src: 'youtube', ...x}));
     PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length})`, load: async () => items});
     fillPlaylists(); $('plist').value = 'yt:' + id; showPlaylist();
