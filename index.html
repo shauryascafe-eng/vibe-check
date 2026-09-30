@@ -1477,7 +1477,6 @@ try { $('base').value = localStorage.getItem('vc_base') || ''; } catch {}
 // Fill these in once (see README). Spotify client IDs and restricted YouTube keys are safe in page code.
 const CONFIG = {
   spotifyClientId: '',
-  youtubeApiKey: '',
   appleTokenUrl: '/api/apple-token',
 };
 const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
@@ -1565,20 +1564,18 @@ $('amConnect').onclick = async () => {
 let YT_P, ytReady;
 $('ytLoad').onclick = async () => {
   const id = ($('ytUrl').value.match(/[?&]list=([\w-]+)/) || [])[1] || $('ytUrl').value.trim();
-  if (!CONFIG.youtubeApiKey) return sstatus('Add your YouTube API key to CONFIG in index.html first (see README)');
-  if (!id) return sstatus('Paste a playlist link containing list=…');
+  if (!/^[\w-]{10,64}$/.test(id)) return sstatus('Paste a playlist link — it contains list=…');
+  if (location.protocol == 'file:') return sstatus('YouTube playlists load on the hosted site (vibe.wasteyourtime.in), not a local file');
+  sstatus('Reading YouTube playlist…');
   try {
-    const out = []; let page = '';
-    do {
-      const j = await (await fetch('https://www.googleapis.com/youtube/v3/playlistItems?' + new URLSearchParams({part: 'snippet', maxResults: 50, playlistId: id, key: CONFIG.youtubeApiKey, pageToken: page}))).json();
-      if (j.error) throw Error(j.error.message); out.push(...j.items); page = j.nextPageToken;
-    } while (page);
-    const items = out.filter(x => x.snippet.resourceId?.videoId).map(x => { const s = x.snippet, [a, t] = s.title.includes(' - ') ? s.title.split(' - ', 2) : [(s.videoOwnerChannelTitle || '').replace(/ - Topic$/, ''), s.title];
-      return {src: 'youtube', id: s.resourceId.videoId, title: t.trim(), artist: a.trim()}; });
+    const r = await fetch('/api/yt?list=' + id), j = await r.json().catch(() => ({}));
+    if (!r.ok) throw Error(j.error || r.status);
+    const items = j.items.map(x => ({src: 'youtube', ...x}));
     PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length})`, load: async () => items});
     fillPlaylists(); $('plist').value = 'yt:' + id; showPlaylist();
   } catch (e) { fail('YouTube', e); }
 };
+$('ytUrl').onkeydown = e => e.key == 'Enter' && $('ytLoad').click();
 function ytPlayer() {
   if (ytReady) return ytReady;
   return ytReady = new Promise(ok => {
