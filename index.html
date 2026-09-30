@@ -282,10 +282,10 @@ audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 .pour.grow .pg{transform-box:fill-box;transform-origin:50% 0;animation:dripgrow 1.6s var(--d,0s) cubic-bezier(.35,.9,.3,1) both}
 @media (prefers-reduced-motion:reduce){.pour.grow .pg{animation:none}}
 :root:not(#pop) .wrap .deck{display:block;padding:0;background:none;border:0;border-radius:0;box-shadow:none;color:#1B1414;perspective:1600px;margin-bottom:10px}
-.frame{--rx:0deg;--ry:0deg;position:relative;padding:30px;border-radius:6px;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .35s ease-out;
+.frame{--rx:0deg;--ry:0deg;position:relative;padding:30px;border-radius:6px;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:flat;transition:transform .35s ease-out;
   background:repeating-linear-gradient(91deg,#ffffff12 0 2px,transparent 2px 11px),repeating-linear-gradient(89deg,#0000001a 0 1px,transparent 1px 17px),linear-gradient(135deg,#dba463,#b8773c 45%,#cf9051 70%,#a8662e);
   box-shadow:0 0 0 3px #1B1414,inset 0 2px 0 #ffffff66,inset 0 -3px 0 #00000040,0 34px 60px -14px #000000a8,14px 14px 0 3px var(--line)}
-.mat{position:relative;background:radial-gradient(#0000000a 1px,transparent 1.3px) 0 0/6px 6px,#FBF8F1;padding:34px 44px 26px;transform-style:preserve-3d;
+.mat{position:relative;background:radial-gradient(#0000000a 1px,transparent 1.3px) 0 0/6px 6px,#FBF8F1;padding:34px 44px 26px;transform-style:flat;
   box-shadow:0 0 0 9px #a3652f,0 0 0 11px #6e4020,inset 0 22px 28px -14px #00000070,inset 16px 0 22px -16px #00000055,inset -10px 0 16px -14px #0000003a}
 .mh-row{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
 :root:not(#pop) .brandname{margin:0;font:400 clamp(30px,5vw,54px)/1 Bungee,Impact,sans-serif;letter-spacing:.04em;color:#1B1414;border:0;padding:0;text-shadow:3px 3px 0 var(--c2)}
@@ -298,7 +298,7 @@ audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 .bolt{position:absolute;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#c9ced4 40%,#7a8189 75%,#4a5057);box-shadow:5px 8px 8px #00000059,inset 0 -1px 2px #0005}
 .bolt::after{content:"";position:absolute;inset:7px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#eef0f2,#9aa1a9)}
 .b1{top:12px;left:12px}.b2{top:12px;right:12px}.b3{bottom:12px;left:12px}.b4{bottom:12px;right:12px}
-.unit-col{display:grid;gap:0;align-content:start;transform-style:preserve-3d}
+.unit-col{display:grid;gap:0;align-content:start;transform-style:flat}
 .unit{position:relative;border-radius:18px;padding:12px 14px 16px;transform:translateZ(10px);border:2.5px solid #1B1414;
   background:linear-gradient(160deg,#454b53,#23272d 55%,#16191d);box-shadow:inset 0 1px 0 #7b838c,inset 0 -2px 0 #000,0 3px 0 #0b0c0e,0 6px 0 #060708,18px 26px 26px -8px #00000080}
 .unit-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
@@ -322,7 +322,7 @@ audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 .jack i{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle,#0b0b0b 0 5px,var(--jc) 5.5px 10px,#dfe3e7 10.5px 12.5px,#7a8189 13px);box-shadow:0 2px 0 #0008,inset 0 1px 0 #fff8;transition:transform .15s}
 .jack b{font:700 10px 'JetBrains Mono',monospace;letter-spacing:.04em;color:color-mix(in srgb,var(--jc) 70%,#000);text-transform:none}
 .jack:hover i,.jack:focus-visible i{transform:scale(1.1)}.jack:focus-visible{outline:2px solid var(--jc);outline-offset:2px}
-.side-col{display:grid;gap:18px;align-content:start;transform-style:preserve-3d}
+.side-col{display:grid;gap:18px;align-content:start;transform-style:flat}
 .remote{display:grid;gap:6px;background:linear-gradient(160deg,#3a4047,#1a1d21);border:2.5px solid #1B1414;border-radius:16px;padding:10px 10px 12px;transform:translateZ(10px);box-shadow:inset 0 1px 0 #6b737c,14px 20px 22px -8px #00000070}
 .remote .print{color:#aeb4bb}
 :root:not(#pop) .deck .vfd{box-shadow:inset 0 6px 16px #000c;border:2px solid #000;padding:10px 12px 8px}
@@ -389,7 +389,7 @@ html,body{overflow-x:clip}
 /* a real object: no painted-on streams; the whole framed piece gets one photographic grain */
 #pourA,#pourB,.landing{display:none!important}
 header{position:relative;z-index:50}
-#frame::after{content:'';position:absolute;inset:0;border-radius:inherit;background:var(--grain);mix-blend-mode:overlay;opacity:.55;pointer-events:none;z-index:40}
+
 /* the framed piece */
 :root:not(#pop):not(#real) .frame{padding:22px;border-radius:3px;background:linear-gradient(145deg,#ffffff26,transparent 22%,transparent 72%,#ffffff12),linear-gradient(#232325,#0b0b0c);
   box-shadow:inset 0 1px 0 #ffffff55,inset 0 0 0 1px #00000040,inset 0 -3px 4px #00000055,0 2px 3px rgba(0,0,0,.35),0 26px 50px -16px rgba(0,0,0,.6),0 60px 110px -40px rgba(0,0,0,.5)}
@@ -554,8 +554,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 /* ================= every section is a machined acrylic plate, bolted to the wall ================= */
 .wrap{counter-reset:plate}
 :root:not(#pop):not(#real) .console{position:relative;margin-top:56px;padding:44px 48px 40px;border-radius:10px;border:1px solid rgba(255,255,255,.9);
-  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.34) 40%,transparent 48%),linear-gradient(160deg,rgba(255,255,255,.62),rgba(255,255,255,.36) 55%,rgba(255,255,255,.46));
-  -webkit-backdrop-filter:blur(18px) saturate(1.15);backdrop-filter:blur(18px) saturate(1.15);
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.34) 40%,transparent 48%),linear-gradient(160deg,rgba(250,249,246,.9),rgba(244,242,238,.82) 55%,rgba(248,246,243,.86));
   box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(0,0,0,.08),inset 1px 0 0 rgba(255,255,255,.7),inset -1px 0 0 rgba(0,0,0,.05),
     0 0 0 1px rgba(0,0,0,.06),0 2px 0 rgba(255,255,255,.55),0 3px 1px -1px rgba(0,0,0,.12),0 26px 44px -20px rgba(0,0,0,.45),0 8px 14px -8px rgba(0,0,0,.2)}
 :root:not(#pop):not(#real) .console::before{content:"";position:absolute;inset:6px;border-radius:6px;pointer-events:none;border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(0,0,0,.035)}   /* the polished bevel, 6 mm in */
@@ -568,7 +567,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 /* titles are printed on the plate, numbered like a panel legend */
 :root:not(#pop):not(#real) h2{counter-increment:plate;font:600 13px/1 Inter,system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#1c1b19;background:none;padding:0 0 0 2px;margin:0 0 10px;
   border:0;box-shadow:none;transform:none;clip-path:none;display:flex;align-items:center;gap:12px}
-:root:not(#pop):not(#real) h2::before{content:counter(plate,decimal-leading-zero);font:500 10px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#fff;background:#1c1b19;border-radius:3px;padding:4px 6px}
+:root:not(#pop):not(#real) h2::before{content:attr(data-n);font:500 10px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#fff;background:#1c1b19;border-radius:3px;padding:4px 6px}
 :root:not(#pop):not(#real) .console .rule{letter-spacing:.18em;color:#5d5850}
 /* inner areas are recessed wells milled into the acrylic */
 :root:not(#pop):not(#real) .drop,:root:not(#pop):not(#real) .paste{border:0;border-radius:8px;background:rgba(255,255,255,.4);box-shadow:inset 0 2px 5px rgba(0,0,0,.1),inset 0 0 0 1px rgba(0,0,0,.06),0 1px 0 rgba(255,255,255,.8)}
@@ -576,7 +575,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 :root:not(#pop):not(#real) .console table{background:transparent}
 /* smoked acrylic after dark */
 :root:not(#pop):not(#real)[data-theme=dark] .console{border-color:rgba(255,255,255,.14);
-  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 40%,transparent 48%),linear-gradient(160deg,rgba(40,38,36,.72),rgba(18,17,16,.62) 55%,rgba(28,27,25,.68));
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 40%,transparent 48%),linear-gradient(160deg,rgba(40,38,36,.94),rgba(22,21,20,.9) 55%,rgba(30,29,27,.92));
   box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5),0 26px 44px -20px rgba(0,0,0,.8)}
 :root:not(#pop):not(#real)[data-theme=dark] .console::before{border-color:rgba(255,255,255,.07);box-shadow:none}
 :root:not(#pop):not(#real)[data-theme=dark] h2{color:#efebe4}:root:not(#pop):not(#real)[data-theme=dark] h2::before{background:#efebe4;color:#1c1b19}:root:not(#pop):not(#real)[data-theme=dark] .console .rule{color:#a39c91}
@@ -667,6 +666,10 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
   #drop>.mono{display:none}   /* the long feature list; the section title already says it */
   :root:not(#pop):not(#real) #deckEl .vfd-msg{display:none}  /* the cassette label shows the track name right below */
 }
+
+.frame{transform:none!important;transition:none}
+/* sections below the fold aren't painted until you scroll near them */
+.wrap>section.console{content-visibility:auto;contain-intrinsic-size:auto 900px}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -1077,15 +1080,15 @@ async function load(files) {
 async function runJobs(jobs, failWord, say = status) {
   if (busy) return say('Already analysing — wait for this batch');
   busy = true; $('prog').style.display = 'block';
-  let done = 0, fails = 0, next = 0;
+  let done = 0, fails = 0, next = 0, shown = performance.now(), kept = shown;
   const runner = async () => { while (next < jobs.length) {
     const j = jobs[next++]; say(`Analysing ${done + 1}/${jobs.length} · ${j.name}`);
-    if (!LIB.some(t => t.id == j.id)) { try { const t = await j.run(); if (t) { LIB.push(t); save(); } else fails++; } catch (e) { fails++; console.warn(j.name, e); } }
+    if (!LIB.some(t => t.id == j.id)) { try { const t = await j.run(); if (t) LIB.push(t); else fails++; } catch (e) { fails++; console.warn(j.name, e); } }
     $('prog').firstChild.style.width = (100 * ++done / jobs.length) + '%';
-    if (done % 5 == 0 || done == jobs.length) rebuild();
+    const now = performance.now(); if (now - shown > 1500) { shown = now; rebuild(); } if (now - kept > 3000) { kept = now; save(); }
   } };
   await Promise.all(POOL.map(runner));
-  busy = false; setTimeout(() => $('prog').style.display = 'none', 600);
+  save(); busy = false; setTimeout(() => $('prog').style.display = 'none', 600);
   say(`Done · ${jobs.length - fails} tracks ready${fails ? ` · ${fails} ${failWord}` : ''} · library ${LIB.length}`);
   rebuild();
   return fails;
@@ -1480,8 +1483,10 @@ $('bAuto').onclick = () => { autoNext = !autoNext; $('bAuto').setAttribute('aria
 const HUB = 26, FULL = 74, AREA = FULL * FULL - HUB * HUB, TAPE = 170;
 const needles = [{a: -48, v: 0, el: $('ndlL'), pk: $('peakL'), hold: 0}, {a: -48, v: 0, el: $('ndlR'), pk: $('peakR'), hold: 0}];
 let last = performance.now(), spd = 0, angL = 0, angR = 0, vfdAt = 0, lastP = -1;
+let deckSeen = true; new IntersectionObserver(e => deckSeen = e[0].isIntersecting).observe(deckEl);
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  if (!deckSeen || document.hidden) return requestAnimationFrame(frame);
   const on = !!deckA.src && !deckA.paused;
   const want = SCR ? SCR.v : scan ? scan * 16 : on ? deckA.playbackRate : busy ? 1 : 0;
   spd += (want - spd) * (1 - Math.exp(-dt / (want ? 0.18 : 0.45)));
@@ -1505,7 +1510,7 @@ function frame(now) {
   needles.forEach((n, i) => {
     const target = -48 + 96 * Math.min(lv[i] / 0.2, 1.47) / 1.4125; // 0 VU = −14 dBFS RMS
     n.v += (185 * (target - n.a) - 21 * n.v) * dt; n.a += n.v * dt;
-    n.el.setAttribute('transform', `rotate(${Math.max(-50, Math.min(52, n.a)).toFixed(2)} 110 150)`);
+    const deg = Math.max(-50, Math.min(52, n.a)).toFixed(1); if (deg != n.deg) { n.deg = deg; n.el.setAttribute('transform', `rotate(${deg} 110 150)`); }
     if (pk[i] > 0.97) n.hold = now + 250; n.pk.classList.toggle('on', now < n.hold);
   });
   if (now - vfdAt > 120) { vfdAt = now; vfd(); }
@@ -1515,6 +1520,7 @@ requestAnimationFrame(frame);
 
 /* ---------- framed deck: live spec text, tilt, and paint that runs from each patch-bay jack to its section ---------- */
 ['sec-load', 'sec-taste', 'sec-arrange'].forEach((id, i) => { const el = document.querySelectorAll('.wrap>section.console')[i]; if (el) el.id = id; });
+document.querySelectorAll('.wrap>section.console h2').forEach((h, i) => h.dataset.n = String(i + 1).padStart(2, '0'));   // not a CSS counter: content-visibility scopes counters per section
 function spec() {
   const n = LIB.length;
   if (!n) { $('spec').textContent = 'The Vibe Check VC-1 is a play-and-analyse cassette deck. Load tapes and it reads each one’s key, BPM and energy, ranks them against your taste and plays them back in harmonic order.'; return; }
@@ -1543,47 +1549,9 @@ function wcPath(x, y0, y1, w, seed, grow = 1.6) {
 const WC = [3, 4, 5, 6].map(i => `var(--c${i})`);
 /* Dense, slow paint (think blood viscosity): pools under each socket, splits into a thick main run and
    thinner side runs, gathers on the frame rail, drops down the wall and pools on the lip of its own card. */
-function pour() {
-  const deck = $('deckEl'), wrap = deck.parentElement, mat = document.querySelector('.mat'), A = $('pourA'), B = $('pourB');
-  const wr = wrap.getBoundingClientRect(), dr = deck.getBoundingClientRect(), mr = mat.getBoundingClientRect(), fr = $('frame').getBoundingClientRect();
-  const secs = [...document.querySelectorAll('.wrap>section.console')], stats = streamStats();
-  let a = '', b = '';
-  const blob = (cx, cy, rx, ry, fill) => `<ellipse class=pd cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="${fill}"/><ellipse class=hl3 cx="${(cx - rx * .35).toFixed(1)}" cy="${(cy - ry * .35).toFixed(1)}" rx="${(rx * .22).toFixed(1)}" ry="${(ry * .18).toFixed(1)}"/>`;
-  document.querySelectorAll('.jack').forEach((j, i) => {
-    $('jst' + i).textContent = stats[i].s;
-    const jr = j.querySelector('i').getBoundingClientRect(), col = `url(#pg${i + 3})`, w = stats[i].w * 1.05;
-    const x = jr.left + jr.width / 2 - mr.left, y0 = jr.bottom - mr.top - 4, yEnd = dr.bottom - mr.top + 2, rail = fr.bottom - mr.top - 18, span = rail - y0;
-    let g = dripSVG(x, y0, yEnd, w, col, i + 11, {bead: false, thin: .8, bump: 1.8});
-    for (const [dx, k, len] of [[-.95, .55, .45 + (i % 2) * .2], [.9, .42, .25 + ((i + 1) % 2) * .25]])
-      g += dripSVG(x + dx * w, y0 + w * .3, y0 + w * .3 + span * len, w * k, col, i * 7 + 3 + k * 10, {thin: .8, bump: 2.2});
-    a += `<g class=pg style="--d:${i * .35}s">${g}${blob(x, y0 + w * .25, w * 1.25, w * .6, col)}${blob(x, rail, w * .95, w * .5, col)}</g>`;
-    const sec = secs[i]; if (!sec) return;
-    const sr = sec.getBoundingClientRect(), xb = jr.left + jr.width / 2 - wr.left, yb0 = dr.bottom - wr.top - 3, yb1 = sr.top - wr.top + 3;
-    b += `<g class=pg style="--d:${1.6 + i * .4}s">${dripSVG(xb, yb0, yb1, w * .9, col, i + 21, {start: 0, thin: .8, meniscus: false, bead: false, bump: 1.4})}</g>`;
-    // where it lands: a pool along the card's top edge and a few short runs down its face
-    let land = sec.querySelector(':scope>.landing'); if (!land) { land = document.createElement('div'); land.className = 'landing'; land.setAttribute('aria-hidden', 'true'); sec.prepend(land); }
-    const lx = xb + wr.left - sr.left, pw = w * 3.2;
-    let l = `<path class=pd d="M${lx - pw} 0 Q${lx - pw * .6} ${w * .9} ${lx} ${w * .95} Q${lx + pw * .6} ${w * .9} ${lx + pw} 0 Z" fill="${col}"/>`;
-    for (const [dx, k, len] of [[-.55, .55, 26 + i * 5], [0, .8, Math.min(64, 36 + stats[i].w * 1.2)], [.6, .45, 18 + (3 - i) * 5]]) l += dripSVG(lx + dx * pw, w * .2, len, w * k, col, i * 5 + k * 20, {thin: .82, bump: 1.6, meniscus: false});
-    land.style.left = '0px'; land.style.width = sr.width + 'px';
-    land.innerHTML = `<svg width="${sr.width}" height=200 viewBox="0 -2 ${sr.width} 200"><g class="pg lg" style="--d:${2.6 + i * .4}s">${l}</g></svg>`;
-  });
-  const size = (el, W, H) => { el.setAttribute('viewBox', `0 0 ${W} ${H}`); el.setAttribute('width', W); el.setAttribute('height', H); };
-  const OFF = 0; size(A, mr.width, dr.bottom - mr.top + 4); size(B, wr.width, wrap.scrollHeight); B.style.left = '0px';
-  const gr = performance.now() < growUntil; A.classList.toggle('grow', gr); B.classList.toggle('grow', gr);
-  document.querySelectorAll('.landing').forEach(e => e.classList.toggle('grow', gr));
-  A.innerHTML = a; B.innerHTML = b;
-}
+function pour() { const st = streamStats(); document.querySelectorAll('.jack b').forEach((b, i) => { if (st[i]) b.textContent = st[i].s; }); }
 let pourT; const pourSoon = () => { clearTimeout(pourT); pourT = setTimeout(pour, 60); };
-new ResizeObserver(pourSoon).observe(document.querySelector('.wrap'));
 document.fonts?.ready.then(pourSoon);
-/* gentle 3D tilt of the framed piece */
-if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(pointer: fine)').matches) {
-  const fr = $('frame'), dk = $('deckEl');
-  dk.addEventListener('pointermove', e => { const r = dk.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-    fr.style.setProperty('--ry', (x * 3).toFixed(2) + 'deg'); fr.style.setProperty('--rx', (-y * 2.2).toFixed(2) + 'deg'); });
-  dk.addEventListener('pointerleave', () => { fr.style.setProperty('--ry', '0deg'); fr.style.setProperty('--rx', '0deg'); });
-}
 
 /* ---------- sort any playlist: 30-second previews (via /api/preview + /api/audio on the hosted site) ---------- */
 const cleanTitle = t => String(t || '').replace(/\((official|lyric|audio|visuali[sz]er|music video|video|hd|4k)[^)]*\)|\[(official|lyric|audio|hd|4k)[^\]]*\]|official (music )?video|lyrics?/gi, '').replace(/\s+/g, ' ').trim();
