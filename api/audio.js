@@ -1,5 +1,5 @@
 // Streams a preview file back same-origin so the browser can decode and analyse it. Only preview CDNs are allowed.
-const ALLOW = [/\.dzcdn\.net$/, /\.itunes\.apple\.com$/, /\.mzstatic\.com$/, /^audio-ssl\.itunes\.apple\.com$/];
+const ALLOW = [/\.dzcdn\.net$/, /^p\.scdn\.co$/, /\.itunes\.apple\.com$/, /\.mzstatic\.com$/, /^audio-ssl\.itunes\.apple\.com$/];
 module.exports = async (req, res) => {
   let u; try { u = new URL(String(req.query.u || '')); } catch { return res.status(400).send('bad url'); }
   if (u.protocol != 'https:' || !ALLOW.some(r => r.test(u.hostname))) return res.status(403).send('host not allowed');

@@ -50,3 +50,7 @@
 ## v26 — YouTube only
 - Spotify / Apple Music removed (API limits). `api/apple-token.js` deleted; `SPOTIFY_*` / `APPLE_*` env vars in Vercel can be removed.
 - Library now lasts per tab (sessionStorage); merge-or-fresh prompt when adding; keyboard shortcuts (press ?).
+
+## v27 — playlist links from every free service
+- [ ] Optional: `LASTFM_API_KEY` in Vercel (free, last.fm/api/account/create) to import Last.fm profiles
+- [ ] Test one real link each: YouTube, Spotify, Apple Music, Deezer, SoundCloud, Bandcamp, JioSaavn

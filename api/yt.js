@@ -46,19 +46,25 @@ const split = v => {   // "Artist - Title" in the video title, else the channel 
   const [a, t] = v.title.includes(' - ') ? v.title.split(' - ', 2) : [v.channel.replace(/ - Topic$/, ''), v.title];
   return {id: v.id, title: t.trim(), artist: a.trim()};
 };
+// all the ways, in order; returns {vids, used, tried}
+async function ytList(id) {
+  const key = process.env.YOUTUBE_API_KEY, tried = [];
+  const ways = [key && ['api', () => fromApi(id, key)], ['web', () => fromInnertube(id)],
+    ['page', async () => fromPage(await (await fetch('https://www.youtube.com/playlist?list=' + id, {headers: {'Accept-Language': 'en-US,en;q=0.9', 'User-Agent': UA, Cookie: 'CONSENT=YES+1'}})).text())],
+    ['rss', () => fromRss(id)]].filter(Boolean);
+  for (const [name, fn] of ways) {
+    try { const vids = await fn(); tried.push(name + ': ' + vids.length); if (vids.length) return {vids: vids.map(split), used: name, tried}; }
+    catch (e) { tried.push(name + ': ' + e.message); }
+  }
+  return {vids: [], used: '', tried};
+}
 module.exports = async (req, res) => {
   const id = String(req.query.list || '');
   if (!/^[\w-]{10,64}$/.test(id)) return res.status(400).json({error: 'not a playlist id'});
-  try {
-    const key = process.env.YOUTUBE_API_KEY, tried = [];
-    const ways = [key && ['api', () => fromApi(id, key)], ['web', () => fromInnertube(id)],
-      ['page', async () => fromPage(await (await fetch('https://www.youtube.com/playlist?list=' + id, {headers: {'Accept-Language': 'en-US,en;q=0.9', 'User-Agent': UA, Cookie: 'CONSENT=YES+1'}})).text())],
-      ['rss', () => fromRss(id)]].filter(Boolean);
-    let vids = [], used = '';
-    for (const [name, fn] of ways) { try { vids = await fn(); } catch (e) { tried.push(name + ': ' + e.message); continue; } tried.push(name + ': ' + vids.length); if (vids.length) { used = name; break; } }
-    if (!vids.length) return res.status(404).json({error: 'YouTube returned no tracks — is the playlist public (not private)?', tried});
-    res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
-    res.json({items: vids.map(split), source: used, partial: used == 'rss'});
-  } catch (e) { res.status(502).json({error: e.message}); }
+  const {vids, used, tried} = await ytList(id);
+  if (!vids.length) return res.status(404).json({error: 'YouTube returned no tracks — is the playlist public (not private)?', tried});
+  res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=86400');
+  res.json({items: vids, source: used, partial: used == 'rss'});
 };
 module.exports.fromPage = fromPage;
+module.exports.ytList = ytList;

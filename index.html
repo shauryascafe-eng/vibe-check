@@ -544,7 +544,12 @@ dialog h3{margin:0 0 8px;font:700 18px Inter,system-ui,sans-serif}dialog p{margi
 dialog .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
 .keys-t{border-collapse:collapse;font-size:14px}.keys-t td{padding:5px 14px 5px 0;border:0}
 kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;background:var(--k-edge,#e4e2dd);box-shadow:0 1px 0 rgba(0,0,0,.25)}
-#ytRow{margin-top:12px}#ytRow[hidden]{display:none}#ytUrl{flex:1;min-width:220px}
+#ytRow{margin-top:12px;align-items:center}#ytRow[hidden]{display:none}#ytUrl{flex:1;min-width:220px}.yt-note{flex-basis:100%;text-align:left;letter-spacing:.1em}
+
+.svcs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 14px;margin-top:14px}
+.svc{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:4px 2px;cursor:pointer;color:color-mix(in srgb,var(--ink) 55%,transparent);font:500 10px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:color .15s}
+.svc i{width:15px;height:15px;background:currentColor;-webkit-mask:var(--u) center/contain no-repeat;mask:var(--u) center/contain no-repeat}
+.svc:hover,.svc.on{color:var(--ink)}.svc.on{color:var(--acc,var(--c1))}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -692,18 +697,19 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 <section class=console>
   <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
   <h2>Load tapes</h2>
-  <div class="rule mono">Bulk analyse · mp3 wav flac m4a aiff ogg · YouTube playlists · press ? for shortcuts</div>
+  <div class="rule mono">Bulk analyse · mp3 wav flac m4a aiff ogg · playlist links · press ? for shortcuts</div>
   <div class=drop id=drop>
     <h3>Drop tracks or whole folders here</h3>
     <div class=mono>Key · Camelot · BPM · Duration · Danceability · Energy · Happiness · Acousticness · Instrumental · Loudness · Brightness · Busyness · Dynamics</div>
     <div class=row>
       <label class="btn solid">＋ Add files<input type=file id=fpick multiple accept="audio/*,.flac,.aiff,.aif" hidden></label>
       <label class=btn>▤ Add folder<input type=file id=dpick webkitdirectory multiple hidden></label>
-      <button class=btn id=ytOpen aria-expanded=false aria-controls=ytRow>▶ YouTube playlist</button>
+      <button class=btn id=ytOpen aria-expanded=false aria-controls=ytRow>🔗 Playlist link</button>
       <button class=btn id=clear>✕ Clear library</button>
     </div>
+    <div class=svcs id=svcs aria-label="Playlist links work from"><button type=button class=svc data-s=youtube title="YouTube"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/youtube.svg)"></i><b>YouTube</b></button><button type=button class=svc data-s=ytmusic title="YT Music"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/youtubemusic.svg)"></i><b>YT Music</b></button><button type=button class=svc data-s=spotify title="Spotify"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/spotify.svg)"></i><b>Spotify</b></button><button type=button class=svc data-s=apple title="Apple Music"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/applemusic.svg)"></i><b>Apple Music</b></button><button type=button class=svc data-s=deezer title="Deezer"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/deezer.svg)"></i><b>Deezer</b></button><button type=button class=svc data-s=soundcloud title="SoundCloud"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/soundcloud.svg)"></i><b>SoundCloud</b></button><button type=button class=svc data-s=bandcamp title="Bandcamp"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/bandcamp.svg)"></i><b>Bandcamp</b></button><button type=button class=svc data-s=jiosaavn title="JioSaavn"><b>JioSaavn</b></button><button type=button class=svc data-s=lastfm title="Last.fm"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/lastdotfm.svg)"></i><b>Last.fm</b></button></div>
     <div class=row id=ytRow hidden>
-      <input id=ytUrl placeholder="Paste a public YouTube / YouTube Music playlist link" aria-label="YouTube playlist link">
+      <input id=ytUrl placeholder="YouTube · Spotify · Apple Music · Deezer · SoundCloud · Bandcamp · JioSaavn · Last.fm link" aria-label="Playlist link">
       <button class="btn solid" id=ytLoad>Load</button>
     </div>
     <div class=prog id=prog><i></i></div>
@@ -763,7 +769,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
   <table class=keys-t><tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr><tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next track</td></tr>
   <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Volume</td></tr><tr><td><kbd>S</kbd></td><td>Stop</td></tr><tr><td><kbd>E</kbd></td><td>Eject</td></tr>
   <tr><td><kbd>K</kbd></td><td>Key lock</td></tr><tr><td><kbd>A</kbd></td><td>Auto next</td></tr><tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Load · Taste · Arrange</td></tr>
-  <tr><td><kbd>Y</kbd></td><td>YouTube playlist</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
+  <tr><td><kbd>L</kbd></td><td>Playlist link</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
   <div class=row><button class="btn solid" value=ok>Got it</button></div>
 </form></dialog>
 
@@ -1233,7 +1239,7 @@ addEventListener('keydown', e => {
     ArrowUp: () => volSet(vol + 5), ArrowDown: () => volSet(vol - 5),
     s: () => $('tpStop').click(), e: eject, k: () => $('bLock').click(), a: () => $('bAuto').click(), t: () => $('theme').click(),
     1: () => $('sec-load').scrollIntoView({behavior: 'smooth'}), 2: () => $('sec-taste').scrollIntoView({behavior: 'smooth'}), 3: () => $('sec-arrange').scrollIntoView({behavior: 'smooth'}),
-    y: () => { $('sec-load').scrollIntoView({behavior: 'smooth'}); if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); },
+    l: () => { $('sec-load').scrollIntoView({behavior: 'smooth'}); if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); },
     o: () => $('fpick').click(), '?': () => $('keysDlg').showModal(),
   }[k];
   if (!act || (onCtl && (k == ' ' || k.startsWith?.('Arrow')))) return;   // let focused buttons / knobs use Space and arrows themselves
@@ -1379,9 +1385,10 @@ const pvId = it => 'pv:' + norm(cleanTitle(it.artist)) + '|' + norm(cleanTitle(i
 function remoteJob(it) {
   const title = cleanTitle(it.title), artist = cleanTitle(it.artist), id = pvId(it);
   return {id, name: `${artist ? artist + ' - ' : ''}${title}`, run: async () => {
-    const q = `${artist} ${title}`.trim(), pr = await fetch('/api/preview?q=' + encodeURIComponent(q));
-    if (!pr.ok) throw Error(pr.status == 404 ? 'no preview' : 'preview service unavailable');
-    const m = await pr.json(), au = await fetch('/api/audio?u=' + encodeURIComponent(m.preview));
+    let m = it.preview && {title, artist, preview: it.preview, duration: it.dur};
+    if (!m) { const pr = await fetch('/api/preview?q=' + encodeURIComponent(`${artist} ${title}`.trim()));
+      if (!pr.ok) throw Error(pr.status == 404 ? 'no preview' : 'preview service unavailable'); m = await pr.json(); }
+    const au = await fetch('/api/audio?u=' + encodeURIComponent(m.preview));
     if (!au.ok) throw Error('preview audio unavailable');
     const blob = await au.blob(), f = new File([blob], `${m.artist} - ${m.title}.${/mp4|m4a|aac/.test(blob.type) ? 'm4a' : 'mp3'}`, {type: blob.type});
     const t = await analyze(f);
@@ -1487,22 +1494,28 @@ $('m3u').onclick = () => {
 try { $('base').value = localStorage.getItem('vc_base') || ''; } catch {}
 
 
-/* ---------- YouTube playlists (public / unlisted) → the library ---------- */
+/* ---------- playlist links from any free service → the library ---------- */
 const norm = s => (s || '').toLowerCase().replace(/\(.*?\)|\[.*?\]|\bfeat\..*|\bft\..*|original mix|official (music )?video|lyrics?|[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
 $('ytOpen').onclick = () => { const r = $('ytRow'); r.hidden = !r.hidden; $('ytOpen').setAttribute('aria-expanded', !r.hidden); if (!r.hidden) $('ytUrl').focus(); };
 $('ytLoad').onclick = async () => {
-  const id = ($('ytUrl').value.match(/[?&]list=([\w-]+)/) || [])[1] || $('ytUrl').value.trim();
-  if (!/^[\w-]{10,64}$/.test(id)) return status('Paste a playlist link — it contains list=…');
-  if (location.protocol == 'file:') return status('YouTube playlists load on the hosted site (vibe.wasteyourtime.in), not a local file');
-  status('Reading YouTube playlist…');
+  const url = $('ytUrl').value.trim();
+  if (!url) return status('Paste a playlist link first');
+  if (location.protocol == 'file:') return status('Playlist links load on the hosted site (vibe.wasteyourtime.in), not a local file');
+  status('Reading playlist…');
   try {
-    const r = await fetch('/api/yt?list=' + id), j = await r.json().catch(() => ({}));
-    if (!r.ok) throw Error((j.error || r.status) + (j.tried ? ` [${j.tried.join(' · ')}]` : ''));
-    if (j.partial) status(`YouTube only gave the newest ${j.items.length} tracks — add a YouTube API key for full playlists`);
-    await sortList(j.items.map(x => ({src: 'youtube', ...x})), status);
-  } catch (e) { status(`YouTube: ${e.message || e}`); }
+    const r = await fetch('/api/playlist?url=' + encodeURIComponent(url)), j = await r.json().catch(() => ({}));
+    if (!r.ok) throw Error(j.error || r.status);
+    const say = m => status(j.partial ? `${m} · only part of “${j.name}” was readable` : m);
+    say(`${j.name} · ${j.items.length} tracks from ${j.service}`);
+    await sortList(j.items, say);
+  } catch (e) { status(`Playlist: ${e.message || e}`); }
 };
 $('ytUrl').onkeydown = e => e.key == 'Enter' && $('ytLoad').click();
+// light up the service the pasted link belongs to; a logo click opens the box
+const svcOf = u => /music\.youtube/.test(u) ? 'ytmusic' : /youtube|youtu\.be/.test(u) ? 'youtube' : /deezer/.test(u) ? 'deezer' : /spotify/.test(u) ? 'spotify' : /apple\.com/.test(u) ? 'apple'
+  : /soundcloud/.test(u) ? 'soundcloud' : /bandcamp/.test(u) ? 'bandcamp' : /jiosaavn/.test(u) ? 'jiosaavn' : /last\.fm/.test(u) ? 'lastfm' : '';
+$('ytUrl').oninput = () => { const k = svcOf($('ytUrl').value); document.querySelectorAll('.svc').forEach(b => b.classList.toggle('on', b.dataset.s == k)); };
+$('svcs').onclick = e => { if (!e.target.closest('.svc')) return; if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); };
 
 /* ---------- collage background: a pile of pop-art cassettes and loose tape ---------- */
 /* A real paint drip: a meniscus where it leaves the edge, a body that thins as it runs,
