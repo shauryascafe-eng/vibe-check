@@ -536,6 +536,11 @@ html,body{overflow-x:clip}
 :root:not(#pop):not(#real) input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:2px}
 :root:not(#pop):not(#real) .act a,:root:not(#pop):not(#real) .act button{border:0;border-radius:5px;background:var(--k-bg);color:var(--k-ink);box-shadow:inset 0 0 0 1px var(--k-edge),0 1.5px 0 var(--k-shadow)}
 :root:not(#pop):not(#real) .key{border:0;border-radius:4px;font:600 11px 'JetBrains Mono',monospace;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+
+.paste{margin-top:18px;display:grid;gap:10px;padding:20px;border-radius:10px;border:1.5px dashed color-mix(in srgb,var(--ink) 25%,transparent)}
+.paste h3{margin:0;font-size:18px}.paste p{margin:0;letter-spacing:.12em;line-height:1.7}
+.paste .row{display:flex;gap:10px;flex-wrap:wrap}
+#plain{width:100%;font:14px/1.5 'JetBrains Mono',monospace;background:var(--k-bg,var(--panel));color:var(--ink);border:0;border-radius:8px;padding:12px;box-shadow:inset 0 0 0 1px var(--k-edge,var(--edge)),inset 0 1px 3px rgba(0,0,0,.08);resize:vertical}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -695,6 +700,15 @@ html,body{overflow-x:clip}
     <div class=prog id=prog><i></i></div>
     <div class=mono id=status></div>
   </div>
+  <div class=paste>
+    <h3>No files? Sort any playlist</h3>
+    <p class=mono>Paste songs, one per line as “Artist - Title”, or add a playlist CSV (e.g. from Exportify for Spotify). Numbers come from streaming catalogue data; anything missing is analysed from its 30-second preview.</p>
+    <textarea id=plain rows=5 placeholder="Daft Punk - One More Time&#10;Fred again.. - Delilah&#10;Peggy Gou - (It Goes Like) Nanana"></textarea>
+    <div class=row>
+      <button class="btn solid" id=pasteGo>⚡ Analyse list</button>
+      <label class=btn>⇪ Playlist CSV<input type=file id=csvpick accept=".csv,.txt,text/csv,text/plain" hidden></label>
+    </div>
+  </div>
 </section>
 
 <section class=console>
@@ -741,6 +755,7 @@ html,body{overflow-x:clip}
   <div class=tools style="margin-top:12px">
     <select id=plist aria-label="Playlist"><option value="">Choose a playlist…</option></select>
     <span style="flex:1"></span>
+    <button class="btn solid" id=anaPl>⚡ Analyse this playlist</button>
     <button class=btn id=toSp>⇪ Save Arrange order to Spotify</button><button class=btn id=toAm>⇪ Save to Apple Music</button>
   </div>
   <div class=mono id=sstatus style="margin-top:12px"></div>
@@ -927,21 +942,22 @@ async function walk(entry, out) {
 }
 async function load(files) {
   files = files.filter(f => AUDIO.test(f.name));
-  if (!files.length || busy) return status(busy ? 'Already analysing — wait for this batch' : 'No audio files found');
+  if (!files.length) return status('No audio files found');
+  return runJobs(files.map(f => ({id: f.name + '|' + f.size, name: f.name, run: () => { FILES.set(f.name + '|' + f.size, f); return analyze(f); }})), "couldn't be decoded");
+}
+async function runJobs(jobs, failWord, say = status) {
+  if (busy) return say('Already analysing — wait for this batch');
   busy = true; $('prog').style.display = 'block';
   let done = 0, fails = 0, next = 0;
-  const runner = async () => { while (next < files.length) {
-    const f = files[next++], id = f.name + '|' + f.size; FILES.set(id, f);
-    status(`Analysing ${done + 1}/${files.length} · ${f.name}`);
-    if (!LIB.some(t => t.id == id)) {
-      try { LIB.push(await analyze(f)); save(); } catch (e) { fails++; console.warn(f.name, e); }
-    }
-    $('prog').firstChild.style.width = (100 * ++done / files.length) + '%';
-    if (done % 5 == 0 || done == files.length) rebuild();
+  const runner = async () => { while (next < jobs.length) {
+    const j = jobs[next++]; say(`Analysing ${done + 1}/${jobs.length} · ${j.name}`);
+    if (!LIB.some(t => t.id == j.id)) { try { const t = await j.run(); if (t) { LIB.push(t); save(); } else fails++; } catch (e) { fails++; console.warn(j.name, e); } }
+    $('prog').firstChild.style.width = (100 * ++done / jobs.length) + '%';
+    if (done % 5 == 0 || done == jobs.length) rebuild();
   } };
   await Promise.all(POOL.map(runner));
   busy = false; setTimeout(() => $('prog').style.display = 'none', 600);
-  status(`Done · ${files.length - fails} tracks ready${fails ? ` · ${fails} couldn't be decoded` : ''} · library ${LIB.length}`);
+  say(`Done · ${jobs.length - fails} tracks ready${fails ? ` · ${fails} ${failWord}` : ''} · library ${LIB.length}`);
   rebuild();
 }
 const status = s => { $('status').textContent = s; if (busy) vmsg(s.split(' · ')[0]); };
@@ -1039,10 +1055,10 @@ function ring(label, frac, text) {
 function detail(t) {
   const f = FILES.get(t.id); if (f && !URLS.has(t.id)) URLS.set(t.id, URL.createObjectURL(f));
   return `<tr class=detail><td colspan=11>
-    <div class=tiles><div><b>${esc(t.keyName)}</b><span class=mono>Key</span></div><div><b>${t.key}</b><span class=mono>Camelot</span></div><div><b>${Math.round(t.bpm)}</b><span class=mono>BPM</span></div><div><b>${mmss(t.dur)}</b><span class=mono>Duration</span></div><div><b>${mmss(t.intro)}</b><span class=mono>Intro</span></div><div><b>${mmss(t.outro)}</b><span class=mono>Outro</span></div>${t.mikEnergy != null ? `<div><b>${t.mikEnergy}</b><span class=mono>MIK energy</span></div>` : ''}</div>
-    <div class=mono style="margin:-6px 0 14px">Key ${t.keySrc == 'tag' ? `from file tag · Vibe Check detected ${t.aiKey}` : 'detected by Vibe Check'}</div>${wave(t)}
-    <div class=rings>${ring('Danceability', t.dance / 100, t.dance)}${ring('Energy', t.energy / 100, t.energy)}${t.ai ? ring('Happiness', t.happy / 100, t.happy) + ring('Acoustic', t.acoustic / 100, t.acoustic) + ring('Instrumental', t.instr / 100, t.instr) : ''}${ring('Loudness', (t.loud + 30) / 25, t.loud)}${ring('Brightness', (t.bright - 1000) / 4000, (t.bright / 1000).toFixed(1) + 'k')}${ring('Busyness', t.busy / 8, t.busy)}${ring('Dynamics', t.dyn / 10, t.dyn)}</div>
-    ${URLS.has(t.id) ? `<audio controls src="${URLS.get(t.id)}"></audio>` : `<div class=mono style="margin-top:14px">Re-add the file this session to preview it here</div>`}
+    <div class=tiles><div><b>${esc(t.keyName)}</b><span class=mono>Key</span></div><div><b>${t.key}</b><span class=mono>Camelot</span></div><div><b>${Math.round(t.bpm)}</b><span class=mono>BPM</span></div><div><b>${mmss(t.dur)}</b><span class=mono>Duration</span></div>${t.wave ? `<div><b>${mmss(t.intro)}</b><span class=mono>Intro</span></div><div><b>${mmss(t.outro)}</b><span class=mono>Outro</span></div>` : ''}${t.mikEnergy != null ? `<div><b>${t.mikEnergy}</b><span class=mono>MIK energy</span></div>` : ''}</div>
+    <div class=mono style="margin:-6px 0 14px">Key ${t.keySrc == 'tag' ? `from file tag · Vibe Check detected ${t.aiKey}` : t.keySrc == 'api' ? 'and numbers from streaming catalogue data' : 'detected by Vibe Check'}</div>${wave(t)}
+    <div class=rings>${ring('Danceability', t.dance / 100, t.dance)}${ring('Energy', t.energy / 100, t.energy)}${t.ai ? ring('Happiness', t.happy / 100, t.happy) + ring('Acoustic', t.acoustic / 100, t.acoustic) + ring('Instrumental', t.instr / 100, t.instr) : ''}${ring('Loudness', (t.loud + 30) / 25, t.loud)}${t.bright == null ? '' : ring('Brightness', (t.bright - 1000) / 4000, (t.bright / 1000).toFixed(1) + 'k') + ring('Busyness', t.busy / 8, t.busy) + ring('Dynamics', t.dyn / 10, t.dyn)}</div>
+    ${URLS.has(t.id) ? `<audio controls src="${URLS.get(t.id)}"></audio>` : `<div class=mono style="margin-top:14px">${t.stream ? `Play it from the Streaming panel (${t.stream.src})` : 'Re-add the file this session to preview it here'}</div>`}
     <div class=mono style="margin-top:10px;letter-spacing:.1em">${esc(t.path)}</div></td></tr>`;
 }
 function render() {
@@ -1058,7 +1074,7 @@ function render() {
     return `<tr draggable=true data-id="${esc(t.id)}" class="${t === ref ? 'ref' : ''}">
       <td class=n>${String(n + 1).padStart(2, '0')}</td>
       <td class=t data-act=open>${esc(title(t))}<small>${t.artist ? esc(t.artist) + ' · ' : ''}${mmss(t.dur)}${t.tags?.length ? ' · ' + esc(t.tags.join(', ')) : ''}${DUPS.has(t.id) ? ' <span class=dup>duplicate</span>' : ''}</small></td>
-      <td class=m>${t.bpm}</td><td><span class=key style="--kc:${kc(t.key)}" title="${t.keySrc == 'tag' ? 'From the file tag (e.g. Mixed In Key)' : 'Detected by Vibe Check'}">${t.key}${t.keySrc == 'tag' ? '•' : ''}</span></td>
+      <td class=m>${t.bpm}</td><td><span class=key style="--kc:${kc(t.key)}" title="${t.keySrc == 'tag' ? 'From the file tag (e.g. Mixed In Key)' : t.keySrc == 'api' ? 'From streaming catalogue data' : t.preview ? 'Detected from the 30-second preview' : 'Detected by Vibe Check'}">${t.key}${t.keySrc == 'tag' ? '•' : t.keySrc == 'api' ? '◇' : t.preview ? '◦' : ''}</span></td>
       <td class="m hide">${t.dance}</td><td class="m hide">${t.energy}</td><td class="m hide">${t.happy ?? "–"}</td><td class="m hide">${t.loud}</td>
       <td>${vu(Math.max(0, Math.round(100 * (1 - dist(t)))))}</td><td>${tr}</td>
       <td class=act><button data-act=like title="More like this / start mix here">≈</button> <a target=_blank href="https://tunebat.com/Search?q=${encodeURIComponent(title(t))}" title="Find similar online">↗</a> <button class=x data-act=del title="Remove from library">✕</button></td></tr>${open == t.id ? detail(t) : ''}`;
@@ -1342,6 +1358,82 @@ if (!matchMedia('(prefers-reduced-motion: reduce)').matches && matchMedia('(poin
   dk.addEventListener('pointerleave', () => { fr.style.setProperty('--ry', '0deg'); fr.style.setProperty('--rx', '0deg'); });
 }
 
+/* ---------- sort any playlist: 30-second previews (via /api/preview + /api/audio on the hosted site) ---------- */
+const cleanTitle = t => String(t || '').replace(/\((official|lyric|audio|visuali[sz]er|music video|video|hd|4k)[^)]*\)|\[(official|lyric|audio|hd|4k)[^\]]*\]|official (music )?video|lyrics?/gi, '').replace(/\s+/g, ' ').trim();
+const pvId = it => 'pv:' + norm(cleanTitle(it.artist)) + '|' + norm(cleanTitle(it.title));
+function remoteJob(it) {
+  const title = cleanTitle(it.title), artist = cleanTitle(it.artist), id = pvId(it);
+  return {id, name: `${artist ? artist + ' - ' : ''}${title}`, run: async () => {
+    const q = `${artist} ${title}`.trim(), pr = await fetch('/api/preview?q=' + encodeURIComponent(q));
+    if (!pr.ok) throw Error(pr.status == 404 ? 'no preview' : 'preview service unavailable');
+    const m = await pr.json(), au = await fetch('/api/audio?u=' + encodeURIComponent(m.preview));
+    if (!au.ok) throw Error('preview audio unavailable');
+    const blob = await au.blob(), f = new File([blob], `${m.artist} - ${m.title}.${/mp4|m4a|aac/.test(blob.type) ? 'm4a' : 'mp3'}`, {type: blob.type});
+    const t = await analyze(f);
+    FILES.set(id, f);
+    return {...t, id, file: f.name, path: `${m.artist} - ${m.title}`, artist: m.artist, dur: m.duration || t.dur, preview: true, cover: m.cover || null,
+      stream: it.src ? {src: it.src, id: it.id} : null, keySrc: 'preview'};
+  }};
+}
+/* catalogue data first (/api/features: Spotify id or ISRC → key, BPM, energy… instantly); only the misses get preview-analysed */
+const PCN = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'], p100 = x => Math.round(100 * clamp(x));
+function apiRec(it, f) {
+  if (!(f.key >= 0) || !f.tempo) return null;
+  const title = cleanTitle(it.title), artist = cleanTitle(it.artist), key = camelot(PCN[f.key], f.mode ? 'major' : 'minor'), name = `${artist ? artist + ' - ' : ''}${title}`;
+  return {v: 3, id: pvId(it), file: name, path: name, dur: it.dur || 0, artist, key, keyName: NAME[key], keySrc: 'api', aiKey: key, mikEnergy: null, ai: true,
+    bpm: +f.tempo.toFixed(1), dance: p100(f.danceability), energy: p100(f.energy), happy: p100(f.valence), acoustic: p100(f.acousticness), instr: p100(f.instrumentalness),
+    loud: +(+f.loudness).toFixed(1), bright: null, busy: null, dyn: null, tags: [], wave: null, breaks: [], stream: it.src ? {src: it.src, id: it.id} : null, sp: f.sp};
+}
+async function fromStreams(items, say) {
+  const left = [];
+  for (let i = 0; i < items.length; i += 100) {
+    const chunk = items.slice(i, i + 100); say(`Fetching track data ${i + 1}–${i + chunk.length} of ${items.length}…`);
+    try {
+      const r = await fetch('/api/features', {method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({items: chunk.map(it => ({sp: it.src == 'spotify' ? it.id : it.sp, isrc: it.isrc, title: it.title, artist: it.artist}))})});
+      if (!r.ok) throw Error(r.status);
+      (await r.json()).features.forEach((f, k) => { const t = f && apiRec(chunk[k], f); t ? LIB.push(t) : left.push(chunk[k]); });
+      save(); rebuild();
+    } catch (e) { console.warn('features', e); left.push(...chunk); }
+  }
+  return left;
+}
+async function sortList(items, say) {
+  items = items.filter(i => i.title);
+  if (!items.length) return say('No songs found — use one per line, “Artist - Title”');
+  if (location.protocol == 'file:') return say('Streaming data works on the hosted site (vibe.wasteyourtime.in), not a local file');
+  if (busy) return say('Already analysing — wait for this batch');
+  const seen = new Set(LIB.map(t => t.id)), todo = items.slice(0, 1000).filter(it => !seen.has(pvId(it)) && seen.add(pvId(it)));
+  const left = await fromStreams(todo, say), got = todo.length - left.length;
+  if (!left.length) return say(`Done · ${got} tracks from streaming data · library ${LIB.length}`);
+  // ponytail: misses fall back to 30-s preview analysis, capped at 300 per run
+  say(`${got} from streaming data · analysing ${Math.min(left.length, 300)} more from previews…`);
+  await runJobs(left.slice(0, 300).map(remoteJob), 'had no preview', say);
+}
+function parseLines(text) {
+  return text.split(/\r?\n/).map(l => l.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean).map(l => {
+    const m = l.split(/\s+[-–—]\s+/); if (m.length > 1) return {artist: m[0], title: m.slice(1).join(' - ')};
+    const b = l.match(/^(.*)\s+by\s+(.*)$/i); return b ? {title: b[1], artist: b[2]} : {title: l, artist: ''};
+  });
+}
+function parseCSV(text) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) { const c = text[i];
+    if (q) { if (c == '"' && text[i + 1] == '"') { cell += '"'; i++; } else if (c == '"') q = false; else cell += c; }
+    else if (c == '"') q = true; else if (c == ',') { row.push(cell); cell = ''; } else if (c == '\n' || c == '\r') { if (c == '\r' && text[i + 1] == '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; } else cell += c; }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const h = (rows.shift() || []).map(x => x.toLowerCase().trim());
+  const ti = h.findIndex(x => /^(track name|title|name|song|track)$/.test(x)), ai = h.findIndex(x => /^(artist name\(s\)|artist|artists|artist name)$/.test(x));
+  if (ti < 0) return null;
+  const ui = h.findIndex(x => /^(track uri|spotify id|uri)$/.test(x)), ii = h.indexOf('isrc');
+  return rows.filter(r => r[ti]).map(r => ({title: r[ti], artist: ai >= 0 ? String(r[ai]).split(/[;,]/)[0] : '', sp: ui >= 0 ? r[ui] : null, isrc: ii >= 0 ? r[ii] : null}));
+}
+$('pasteGo').onclick = () => sortList(parseLines($('plain').value), status);
+$('csvpick').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  const txt = await f.text(), items = parseCSV(txt) || parseLines(txt); sortList(items, status); };
+$('anaPl').onclick = () => { if (!STRACKS.length) return sstatus('Choose a playlist first');
+  sortList(STRACKS, m => { sstatus(m); status(m); }).then(drawPl); };
+
 /* ---------- row actions + drag arrange ---------- */
 const out = $('out');
 out.onclick = e => {
@@ -1427,7 +1519,7 @@ async function spConnected() {
   const lists = await spAll('/me/playlists?limit=50');
   for (const p of lists) PL.set('sp:' + p.id, {src: 'Spotify', name: p.name, load: async () =>
     (await spAll(`/playlists/${p.id}/items?limit=100`)).map(x => x.item || x.track).filter(t => t && t.uri)
-      .map(t => ({src: 'spotify', id: t.uri, title: t.name, artist: t.artists.map(a => a.name).join(', '), dur: t.duration_ms / 1000}))});
+      .map(t => ({src: 'spotify', id: t.uri, isrc: t.external_ids?.isrc, title: t.name, artist: t.artists.map(a => a.name).join(', '), dur: t.duration_ms / 1000}))});
   $('spConnect').textContent = '✓ Spotify'; fillPlaylists(); sstatus(`Spotify connected · ${lists.length} playlists`);
 }
 function spReady() {
@@ -1506,11 +1598,15 @@ async function showPlaylist() {
   const p = PL.get($('plist').value); if (!p) return;
   sstatus(`Loading ${p.name}…`);
   try { STRACKS = await p.load(); } catch (e) { return fail(p.src, e); }
-  const hits = STRACKS.map(matchLocal);
-  sstatus(`${STRACKS.length} tracks · ${hits.filter(Boolean).length} matched to your analysed library`);
+  drawPl();
+  if (location.protocol != 'file:') sortList(STRACKS, m => { sstatus(m); status(m); }).then(drawPl);
+}
+function drawPl() {
+  const hits = STRACKS.map(it => LIB.find(t => t.id == pvId(it)) || matchLocal(it));
+  sstatus(`${STRACKS.length} tracks · ${hits.filter(Boolean).length} with data`);
   $('sout').innerHTML = STRACKS.map((it, i) => { const t = hits[i];
     return `<tr><td class=n>${String(i + 1).padStart(2, '0')}</td><td class=t>${esc(it.title)}<small>${esc(it.artist)}</small></td><td class=mono>${it.src}</td>
-      <td class=tr>${t ? `<b>${t.bpm}</b> bpm · <span class=key style="--kc:${kc(t.key)}">${t.key}</span> · energy <b>${t.energy}</b> · dance <b>${t.dance}</b>` : 'not in your library'}</td>
+      <td class=tr>${t ? `<b>${t.bpm}</b> bpm · <span class=key style="--kc:${kc(t.key)}">${t.key}</span> · energy <b>${t.energy}</b> · dance <b>${t.dance}</b>` : '…'}</td>
       <td class=act><button data-i=${i} title="Play from here">▶</button></td></tr>`; }).join('');
 }
 $('plist').onchange = showPlaylist;

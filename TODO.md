@@ -25,6 +25,7 @@
 - [ ] YouTube: load a public playlist, play
 
 ## Done
+- [x] Sort any playlist from 30-sec previews (paste, CSV, streaming playlists) via /api/preview + /api/audio
 - [x] Read keys from file tags (Mixed In Key / Traktor / Rekordbox)
 - [x] Traktor / Rekordbox .m3u8 export (set base folder in Arrange)
 - [x] Background analysis (Web Workers, 2 at once)
@@ -34,9 +35,14 @@
 - [x] Duplicate finder
 
 ## Next
+- [ ] Test "Sort any playlist" on the live site (paste list, Exportify CSV, Analyse this playlist)
 - [ ] Add Downloads/playmate folders via "+" → benchmark key finder vs Mixed In Key (184 tracks) + calibrate Energy vs MIK 1–10
 
 ## Later / ideas
 - [ ] Private YouTube playlists (Liked Music) — needs Google OAuth
 - [ ] Liveness & Speechiness — no public model yet
 - [ ] Trash old Python files (`analyze.py`, `run.sh`, `setup.sh`, `venv/`, `tracks.js`, `results.csv`, `.gitignore.bak`)
+
+## Automatic streaming data (v19)
+- [ ] Vercel → Settings → Environment Variables: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` (same Spotify app; lets Apple/YouTube/pasted songs be matched to catalogue data). Spotify playlists work without them.
+- [ ] Test: pick a playlist → numbers fill in automatically (◇ = catalogue data, ◦ = preview analysis)
