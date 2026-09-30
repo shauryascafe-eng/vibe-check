@@ -1387,8 +1387,12 @@ function remoteJob(it) {
   const title = cleanTitle(it.title), artist = cleanTitle(it.artist), id = pvId(it);
   return {id, name: `${artist ? artist + ' - ' : ''}${title}`, run: async () => {
     let m = it.preview && {title, artist, preview: it.preview, duration: it.dur};
-    if (!m) { const pr = await fetch('/api/preview?q=' + encodeURIComponent(`${artist} ${title}`.trim()));
-      if (!pr.ok) throw Error(pr.status == 404 ? 'no preview' : 'preview service unavailable'); m = await pr.json(); }
+    for (const q of m ? [] : it.qs || [`${artist} ${title}`.trim()]) {   // several phrasings for messy video titles; first hit wins
+      const pr = await fetch('/api/preview?q=' + encodeURIComponent(q));
+      if (pr.ok) { m = await pr.json(); break; }
+      if (pr.status != 404) throw Error('preview service unavailable');
+    }
+    if (!m) throw Error('no preview');
     const au = await fetch('/api/audio?u=' + encodeURIComponent(m.preview));
     if (!au.ok) throw Error('preview audio unavailable');
     const blob = await au.blob(), f = new File([blob], `${m.artist} - ${m.title}.${/mp4|m4a|aac/.test(blob.type) ? 'm4a' : 'mp3'}`, {type: blob.type});
@@ -1402,18 +1406,18 @@ function remoteJob(it) {
 const PCN = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'], p100 = x => Math.round(100 * clamp(x));
 function apiRec(it, f) {
   if (!(f.key >= 0) || !f.tempo) return null;
-  const title = cleanTitle(it.title), artist = cleanTitle(it.artist), key = camelot(PCN[f.key], f.mode ? 'major' : 'minor'), name = `${artist ? artist + ' - ' : ''}${title}`;
+  const title = f.name || cleanTitle(it.title), artist = f.artist || cleanTitle(it.artist), key = camelot(PCN[f.key], f.mode ? 'major' : 'minor'), name = `${artist ? artist + ' - ' : ''}${title}`;
   return {v: 3, id: pvId(it), file: name, path: name, dur: it.dur || 0, artist, key, keyName: NAME[key], keySrc: 'api', aiKey: key, mikEnergy: null, ai: true,
     bpm: +f.tempo.toFixed(1), dance: p100(f.danceability), energy: p100(f.energy), happy: p100(f.valence), acoustic: p100(f.acousticness), instr: p100(f.instrumentalness),
     loud: +(+f.loudness).toFixed(1), bright: null, busy: null, dyn: null, tags: [], wave: null, breaks: [], stream: it.src ? {src: it.src, id: it.id} : null, sp: f.sp};
 }
 async function fromStreams(items, say) {
   const left = [];
-  for (let i = 0; i < items.length; i += 100) {
-    const chunk = items.slice(i, i + 100); say(`Fetching track data ${i + 1}–${i + chunk.length} of ${items.length}…`);
+  for (let i = 0; i < items.length; i += 50) {
+    const chunk = items.slice(i, i + 50); say(`Fetching track data ${i + 1}–${i + chunk.length} of ${items.length}…`);
     try {
       const r = await fetch('/api/features', {method: 'POST', headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({items: chunk.map(it => ({sp: it.src == 'spotify' ? it.id : it.sp, isrc: it.isrc, title: it.title, artist: it.artist}))})});
+        body: JSON.stringify({items: chunk.map(it => ({sp: it.src == 'spotify' ? it.id : it.sp, isrc: it.isrc, title: it.title, artist: it.artist, qs: it.qs}))})});
       if (!r.ok) throw Error(r.status);
       (await r.json()).features.forEach((f, k) => { const t = f && apiRec(chunk[k], f); t ? LIB.push(t) : left.push(chunk[k]); });
       save(); rebuild();

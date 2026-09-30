@@ -24,7 +24,7 @@ async function fromInnertube(id) {
     const j = await r.json(), before = out.size; collect(j, out);
     const t = out.size > before && token(j); body = t ? {context: ctx, continuation: t} : null;
   }
-  return [...out.values()].filter(v => v.title);
+  return [...out.values()].filter(v => v.title && !/^(private|deleted) video$/i.test(v.title));
 }
 // last resort: the public RSS feed (newest 15 only)
 async function fromRss(id) {
@@ -37,14 +37,19 @@ async function fromApi(id, key) {
   do {   // ponytail: capped at 10 pages (500 tracks)
     const j = await (await fetch('https://www.googleapis.com/youtube/v3/playlistItems?' + new URLSearchParams({part: 'snippet', maxResults: 50, playlistId: id, key, pageToken: page}))).json();
     if (j.error) throw Error(j.error.message);
-    for (const x of j.items) if (x.snippet.resourceId?.videoId) out.push({id: x.snippet.resourceId.videoId, title: x.snippet.title, channel: x.snippet.videoOwnerChannelTitle || ''});
+    for (const x of j.items) if (x.snippet.resourceId?.videoId && !/^(private|deleted) video$/i.test(x.snippet.title)) out.push({id: x.snippet.resourceId.videoId, title: x.snippet.title, channel: x.snippet.videoOwnerChannelTitle || ''});
     page = j.nextPageToken;
   } while (page && out.length < 500);
   return out;
 }
-const split = v => {   // "Artist - Title" in the video title, else the channel ("Artist - Topic" on YouTube Music) is the artist
-  const [a, t] = v.title.includes(' - ') ? v.title.split(' - ', 2) : [v.channel.replace(/ - Topic$/, ''), v.title];
-  return {id: v.id, title: t.trim(), artist: a.trim()};
+const JUNK = /\((?:official|lyric|audio|visuali[sz]er|music video|video|hd|4k|full)[^)]*\)|\[[^\]]*\]|\b(?:official\s+)?(?:music\s+)?video\b|\blyric(?:al|s)?\b|\bhd\b|\b4k\b|\bremaster(?:ed)?\b|\bjukebox\b|\b(?:(?:super\s?hit|evergreen|classic|romantic|old|hindi|bollywood|full|video|lyrical|audio|best|popular|hit)\s+)+songs?\b/gi;   // promo words, and descriptor phrases like “Superhit Classic Hindi Song” — never a lone “song”
+const split = v => {
+  const topic = / - Topic$/.test(v.channel), ch = v.channel.replace(/ - Topic$/, '').trim();
+  let segs = v.title.replace(JUNK, ' ').split(/\s*[|｜]\s*|\s+[-–—]\s+|\s*:\s+/).map(s => s.replace(/\s+/g, ' ').replace(/^[\s,&.-]+|[\s,&.-]+$/g, '').trim()).filter(s => s.length > 1);
+  if (!segs.length) segs = [v.title.trim()];
+  // YouTube Music "Artist - Topic" channels name the artist; otherwise the pieces order varies, so search with several and let the catalogue decide
+  const qs = topic ? [`${ch} ${segs[0]}`, segs[0]] : [...new Set([segs.slice(0, 2).join(' '), segs[0], ch && ch != segs[0] && `${ch} ${segs[0]}`].filter(Boolean))];
+  return {id: v.id, title: segs[0], artist: topic ? ch : segs[1] || ch, qs};
 };
 // all the ways, in order; returns {vids, used, tried}
 async function ytList(id) {

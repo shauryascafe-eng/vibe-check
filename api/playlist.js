@@ -17,7 +17,7 @@ const P = {
     const id = u.searchParams.get('list'); if (!id) throw Error('YouTube link needs list=… (a playlist, not a single video)');
     const {vids, used, tried} = await ytList(id);
     if (!vids.length) throw Error('no tracks [' + tried.join(' · ') + ']');
-    return {name: 'YouTube playlist', items: vids.map(v => ({title: v.title, artist: v.artist, src: 'youtube', id: v.id})), partial: used == 'rss'};
+    return {name: 'YouTube playlist', items: vids.map(v => ({title: v.title, artist: v.artist, qs: v.qs, src: 'youtube', id: v.id})), partial: used == 'rss'};
   },
   // free public API, no key; its tracks carry their own 30-s preview
   async deezer(u) {

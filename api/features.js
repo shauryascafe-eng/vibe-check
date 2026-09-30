@@ -16,10 +16,10 @@ async function spToken() {
 }
 const q = s => String(s || '').replace(/["():]/g, ' ').replace(/\s+/g, ' ').trim();
 async function findSp(it, a) {
-  const tries = [it.isrc && `isrc:${q(it.isrc)}`, it.title && `track:${q(it.title)}${it.artist ? ` artist:${q(it.artist.split(',')[0])}` : ''}`].filter(Boolean);
-  for (const s of tries) {
+  const tries = [it.isrc && `isrc:${q(it.isrc)}`, it.title && it.artist && `track:${q(it.title)} artist:${q(it.artist.split(',')[0])}`, ...(it.qs || [`${it.title} ${it.artist}`]).map(q)].filter(Boolean);
+  for (const s of tries.slice(0, 3)) {
     const r = await fetch('https://api.spotify.com/v1/search?type=track&limit=1&q=' + encodeURIComponent(s), {headers: {Authorization: 'Bearer ' + a}});
-    if (r.ok) { const t = (await r.json()).tracks?.items?.[0]; if (t) return t.id; }
+    if (r.ok) { const t = (await r.json()).tracks?.items?.[0]; if (t) return {id: t.id, name: t.name, artist: t.artists?.[0]?.name}; }
   }
   return null;
 }
@@ -37,19 +37,19 @@ async function rb(ids) {
 const spId = s => (String(s || '').match(/(?:track[:/])?([A-Za-z0-9]{22})$/) || [])[1] || null;
 
 async function features(items) {
-  const ids = items.map(it => spId(it.sp)), need = ids.map((x, i) => x ? -1 : i).filter(i => i >= 0);
+  const ids = items.map(it => spId(it.sp)), names = [], need = ids.map((x, i) => x ? -1 : i).filter(i => i >= 0);
   const a = need.length ? await spToken() : null;
-  if (a) for (let i = 0; i < need.length; i += 5)   // 5 searches at a time
-    await Promise.all(need.slice(i, i + 5).map(async k => { ids[k] = await findSp(items[k], a).catch(() => null); }));
+  if (a) for (let i = 0; i < need.length; i += 10)   // 10 searches at a time
+    await Promise.all(need.slice(i, i + 10).map(async k => { const m = await findSp(items[k], a).catch(() => null); if (m) { ids[k] = m.id; names[k] = m; } }));
   const got = await rb([...new Set(ids.filter(Boolean))]);
-  return ids.map(id => { const f = id && got.get(id); return f ? {sp: id, key: f.key, mode: f.mode, tempo: f.tempo, energy: f.energy, danceability: f.danceability,
+  return ids.map((id, i) => { const f = id && got.get(id); return f ? {sp: id, name: names[i]?.name, artist: names[i]?.artist, key: f.key, mode: f.mode, tempo: f.tempo, energy: f.energy, danceability: f.danceability,
     valence: f.valence, acousticness: f.acousticness, instrumentalness: f.instrumentalness, loudness: f.loudness, liveness: f.liveness, speechiness: f.speechiness} : null; });
 }
 
 module.exports = async (req, res) => {
   const items = (req.body && req.body.items) || [];
   if (req.method != 'POST' || !Array.isArray(items) || !items.length || items.length > 100) return res.status(400).json({error: 'POST {items:[…]} with 1–100 tracks'});
-  try { res.json({features: await features(items.map(it => ({sp: it.sp, isrc: it.isrc, title: String(it.title || '').slice(0, 200), artist: String(it.artist || '').slice(0, 200)})))}); }
+  try { res.json({features: await features(items.map(it => ({sp: it.sp, isrc: it.isrc, title: String(it.title || '').slice(0, 200), artist: String(it.artist || '').slice(0, 200), qs: Array.isArray(it.qs) ? it.qs.slice(0, 4).map(x => String(x).slice(0, 200)) : undefined})))}); }
   catch (e) { res.status(502).json({error: 'data source unavailable'}); }
 };
 module.exports.features = features;
