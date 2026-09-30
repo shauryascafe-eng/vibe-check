@@ -394,11 +394,15 @@ html,body{overflow-x:clip}
 :root:not(#pop):not(#real) .pour .hl,:root:not(#pop):not(#real) .drips .hl{fill:none;stroke:#ffffffa6;stroke-width:2.2}
 :root:not(#pop):not(#real) .drips .bandline{stroke:none}
 :root:not(#pop):not(#real) .drips path,:root:not(#pop):not(#real) .drips ellipse{fill:var(--dc)}
+/* a real object: no painted-on streams; the whole framed piece gets one photographic grain */
+#pourA,#pourB,.landing{display:none!important}
+header{position:relative;z-index:50}
+#frame::after{content:'';position:absolute;inset:0;border-radius:inherit;background:var(--grain);mix-blend-mode:overlay;opacity:.55;pointer-events:none;z-index:40}
 /* the framed piece */
-:root:not(#pop):not(#real) .frame{padding:34px;border-radius:2px;background:linear-gradient(135deg,#ffffff2e,transparent 28%,transparent 70%,#00000038),var(--wood) center/620px auto;
+:root:not(#pop):not(#real) .frame{padding:22px;border-radius:3px;background:linear-gradient(145deg,#ffffff26,transparent 22%,transparent 72%,#ffffff12),linear-gradient(#232325,#0b0b0c);
   box-shadow:inset 0 1px 0 #ffffff55,inset 0 0 0 1px #00000040,inset 0 -3px 4px #00000055,0 2px 3px rgba(0,0,0,.35),0 26px 50px -16px rgba(0,0,0,.6),0 60px 110px -40px rgba(0,0,0,.5)}
 :root:not(#pop):not(#real) .mat{background:var(--paper),#f4f0e7;padding:36px 46px 26px;
-  box-shadow:0 0 0 1px #3d2410,0 0 0 8px #6a4323,0 0 0 9px #2e1a0b,inset 0 26px 32px -18px rgba(0,0,0,.55),inset 20px 0 26px -22px rgba(0,0,0,.45),inset -14px 0 22px -20px rgba(0,0,0,.35),inset 0 -6px 12px -10px rgba(0,0,0,.25)}
+  box-shadow:0 0 0 1px #000,0 0 0 4px #c9a44c,0 0 0 5px #5e4718,inset 0 26px 32px -18px rgba(0,0,0,.55),inset 20px 0 26px -22px rgba(0,0,0,.45),inset -14px 0 22px -20px rgba(0,0,0,.35),inset 0 -6px 12px -10px rgba(0,0,0,.25)}
 :root:not(#pop):not(#real) .brandname{font:900 clamp(30px,5.2vw,58px)/1 Archivo,Inter,sans-serif;font-stretch:125%;font-variation-settings:"wdth" 125;letter-spacing:.01em;color:#121212;text-shadow:none}
 :root:not(#pop):not(#real) .year{font:800 clamp(24px,3.8vw,42px)/1 Archivo,Inter,sans-serif;font-variation-settings:"wdth" 110;color:#121212}
 :root:not(#pop):not(#real) .model{font:500 clamp(15px,2.1vw,22px)/1.2 Archivo,Inter,sans-serif;font-variation-settings:"wdth" 80;letter-spacing:.01em;border-bottom:1.5px solid #121212}
@@ -460,9 +464,9 @@ html,body{overflow-x:clip}
 @media (prefers-reduced-motion:reduce){.pour.grow .wcg{animation:none}}
 
 /* ================= crema deck · dense paint · engineered controls ================= */
-:root{--p1:#a1191f;--p2:#c9820c;--p3:#0d7068;--p4:#a0215a;--p5:#233f99;--p6:#c64c14;--te:#ff5b1a;--te-d:#c7400c;
+:root{--p1:#d81b8c;--p2:#f2c414;--p3:#0fb5d6;--p4:#d81b8c;--p5:#2a5fe0;--p6:#f2701a;--te:#ff5b1a;--te-d:#c7400c;
   --k-bg:#ecebe7;--k-edge:#cfccc5;--k-ink:#1c1b19;--k-shadow:#bdb9b1}
-:root[data-theme=dark]{--p1:#c22229;--p2:#e0960f;--p3:#119084;--p4:#c32a6e;--p5:#3257c4;--p6:#e05a18;--k-bg:#2c2b29;--k-edge:#3d3b38;--k-ink:#efebe4;--k-shadow:#121110}
+:root[data-theme=dark]{--p1:#e8279a;--p2:#ffd21f;--p3:#19c2e4;--p4:#e8279a;--p5:#3a6ff0;--p6:#ff7f24;--k-bg:#2c2b29;--k-edge:#3d3b38;--k-ink:#efebe4;--k-shadow:#121110}
 :root:not(#pop):not(#real) .pour .pd,:root:not(#pop):not(#real) .landing .pd{stroke:rgba(0,0,0,.28);stroke-width:.9}
 :root:not(#pop):not(#real) .pour .hl2,:root:not(#pop):not(#real) .landing .hl2{fill:#fff;opacity:.38;stroke:none}:root:not(#pop):not(#real) .pour .hl3,:root:not(#pop):not(#real) .landing .hl3{fill:#fff;opacity:.82;stroke:none}
 :root:not(#pop):not(#real) .pour .pg,:root:not(#pop):not(#real) .landing .pg{filter:url(#pshadow)}
@@ -639,7 +643,7 @@ html,body{overflow-x:clip}
           </div>
           <div class=ribbon aria-hidden=true></div>
           <div class=keys><button class="tkey" id=tpRew aria-label="Rewind / previous track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 6v12L3 12zM21 6v12l-9-6z"/></svg><span>Rew</span></button><button class="tkey play" id=tpPlay aria-label="Play"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M7 5v14l12-7z"/></svg><span>Play</span></button><button class="tkey" id=tpPause aria-label="Pause"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>Pause</span></button><button class="tkey" id=tpStop aria-label="Stop"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6h12v12H6z"/></svg><span>Stop</span></button><button class="tkey" id=tpFf aria-label="Fast forward / next track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 6v12l9-6zM12 6v12l9-6z"/></svg><span>F.Fwd</span></button></div>
-          <div class=patch><span class=print>Patch bay · paint runs to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a><a class=jack href="#sec-stream" style="--jc:var(--c6)" aria-label="Stream: go to Streaming"><span>Stream</span><b id=jst3>—</b><i></i></a></div></div>
+          <div class=patch><span class=print>Patch bay · jump to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a><a class=jack href="#sec-stream" style="--jc:var(--c6)" aria-label="Stream: go to Streaming"><span>Stream</span><b id=jst3>—</b><i></i></a></div></div>
         </div>
         <div class=side-col>
           <div class=remote><span class=print>Remote LCD</span><div class=vfd>
@@ -1337,10 +1341,6 @@ function pour() {
     land.style.left = '0px'; land.style.width = sr.width + 'px';
     land.innerHTML = `<svg width="${sr.width}" height=200 viewBox="0 -2 ${sr.width} 200"><g class="pg lg" style="--d:${2.6 + i * .4}s">${l}</g></svg>`;
   });
-  // a thick run of colour gathering on the top rail and hanging over the mat
-  const top = fr.top - mr.top + 12;
-  for (const [fx, len, c, wd] of [[.004, 260, 1, 18], [.018, 120, 2, 11], [.992, 300, 4, 19], [.978, 90, 6, 12], [.55, 22, 5, 11], [.68, 30, 3, 10]])
-    a += `<g class=pg style="--d:${fx * 2}s">${dripSVG(fx * mr.width, top, top + len, wd, `url(#pg${c})`, c + 31, {thin: .8, bump: 1.8})}</g>`;
   const size = (el, W, H) => { el.setAttribute('viewBox', `0 0 ${W} ${H}`); el.setAttribute('width', W); el.setAttribute('height', H); };
   const OFF = 0; size(A, mr.width, dr.bottom - mr.top + 4); size(B, wr.width, wrap.scrollHeight); B.style.left = '0px';
   const gr = performance.now() < growUntil; A.classList.toggle('grow', gr); B.classList.toggle('grow', gr);
@@ -1720,94 +1720,21 @@ function dripSVG(x, y0, y1, w, fill, seed, o) {
   const k = dripShape(x, y0, y1, w, seed, o);
   return `<path class=pd d="${k.d}" fill="${fill}"/>${k.hl ? `<path class=hl2 d="${k.hl}"/>` : ''}${k.bead ? `<ellipse class=hl3 cx="${k.bead[0].toFixed(1)}" cy="${k.bead[1].toFixed(1)}" rx="${k.bead[2].toFixed(1)}" ry="${(k.bead[2] * 1.3).toFixed(1)}"/>` : ''}`;
 }
+/* ---------- the wall: warm plaster under a gallery light ---------- */
 function drawArt() {
-  const cv = $('art'), ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight;
+  const cv = $('art'), ctx = cv.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1), W = innerWidth, H = innerHeight, dark = root.dataset.theme == 'dark';
   cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const css = getComputedStyle(root), v = n => css.getPropertyValue(n).trim(), dark = root.dataset.theme == 'dark';
-  let seed = 20260930; const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
-  const hex = h => { h = h.replace('#', ''); if (h.length == 3) h = [...h].map(c => c + c).join(''); return [0, 2, 4].map(i => parseInt(h.slice(i, i + 2), 16)); };
-  const mix = (c, t, to) => { const a = hex(c), b = to == 'w' ? [255, 255, 255] : [0, 0, 0]; return `rgb(${a.map((x, i) => Math.round(x + (b[i] - x) * t)).join(',')})`; };
-  const PAINT = [1, 2, 3, 4, 5, 6].map(i => v('--c' + i));
-  // plaster
-  ctx.fillStyle = dark ? '#1d1b19' : '#e7e0d4'; ctx.fillRect(0, 0, W, H);
-  for (let i = 0; i < 160; i++) { const x = rnd() * W, y = rnd() * H, r = 40 + rnd() * 180, g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, rnd() < .5 ? 'rgba(255,255,255,.05)' : 'rgba(0,0,0,.045)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); }
+  let seed = 7; const rnd = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  ctx.fillStyle = dark ? '#1c1b19' : '#e9e4da'; ctx.fillRect(0, 0, W, H);
+  for (let i = 0; i < 140; i++) { const x = rnd() * W, y = rnd() * H, r = 40 + rnd() * 180, g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, rnd() < .5 ? 'rgba(255,255,255,.04)' : 'rgba(0,0,0,.035)'); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); }
   const nz = document.createElement('canvas'); nz.width = nz.height = 180; const nc = nz.getContext('2d'), id = nc.createImageData(180, 180);
-  for (let i = 0; i < id.data.length; i += 4) { const g = rnd() * 255; id.data[i] = id.data[i + 1] = id.data[i + 2] = g; id.data[i + 3] = dark ? 10 : 16; }
+  for (let i = 0; i < id.data.length; i += 4) { id.data[i] = id.data[i + 1] = id.data[i + 2] = rnd() * 255; id.data[i + 3] = dark ? 10 : 14; }
   nc.putImageData(id, 0, 0); ctx.fillStyle = ctx.createPattern(nz, 'repeat'); ctx.fillRect(0, 0, W, H);
-  // dry-brush strokes sweeping across the wall behind the frame
-  const runs = [];
-  function brush(x0, y0, x1, y1, width, col, alpha) {
-    const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy), nx = -dy / len, ny = dx / len, cx = (x0 + x1) / 2 + nx * len * .12, cy = (y0 + y1) / 2 + ny * len * .12;
-    ctx.lineCap = 'round';
-    for (let k = 0; k < 90; k++) { const o = (rnd() - .5) * width, a = alpha * (.25 + rnd() * .75);
-      ctx.strokeStyle = rnd() < .15 ? mix(col, .35, 'w') : rnd() < .2 ? mix(col, .3, 'k') : col; ctx.globalAlpha = a; ctx.lineWidth = .8 + rnd() * 3.2;
-      ctx.setLineDash([20 + rnd() * 220, rnd() * 14]); ctx.beginPath();
-      ctx.moveTo(x0 + nx * o + (rnd() - .5) * 30, y0 + ny * o); ctx.quadraticCurveTo(cx + nx * o, cy + ny * o, x1 + nx * o * .8 - rnd() * 60, y1 + ny * o * .8); ctx.stroke(); }
-    ctx.setLineDash([]); ctx.globalAlpha = 1;
-    for (let k = 0, n = 2 + Math.floor(rnd() * 2); k < n; k++) { const t = .2 + rnd() * .65, u = 1 - t,
-      bx = u * u * x0 + 2 * u * t * cx + t * t * x1, by = u * u * y0 + 2 * u * t * cy + t * t * y1, sgn = ny > 0 ? 1 : -1;
-      runs.push([bx + nx * sgn * width * .38, by + ny * sgn * width * .38, col]); }
-  }
-  const A = dark ? .35 : .42;
-  brush(-60, H * .18, W * .55, H * .02, Math.min(H, W) * .22, PAINT[2], A);
-  brush(W * .35, H * .95, W + 80, H * .45, Math.min(H, W) * .2, PAINT[3], A);
-  brush(-40, H * .8, W * .45, H * .62, Math.min(H, W) * .14, PAINT[1], A * .9);
-  brush(W * .6, -20, W + 60, H * .3, Math.min(H, W) * .16, PAINT[4], A * .8);
-  // glossy paint running down from the brush strokes
-  function drip(x, y, w, L, col, sd) {
-    const k = dripShape(x, y, y + L, w, sd), g = ctx.createLinearGradient(x - w * .6, 0, x + w * .6, 0);
-    g.addColorStop(0, mix(col, .45, 'k')); g.addColorStop(.22, col); g.addColorStop(.38, mix(col, .42, 'w')); g.addColorStop(.58, col); g.addColorStop(1, mix(col, .5, 'k'));
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.32)'; ctx.shadowBlur = 6; ctx.shadowOffsetX = 1.5; ctx.shadowOffsetY = 3;
-    ctx.fillStyle = g; ctx.fill(new Path2D(k.d)); ctx.restore();
-    ctx.strokeStyle = 'rgba(0,0,0,.18)'; ctx.lineWidth = .8; ctx.stroke(new Path2D(k.d));
-    if (k.hl) { ctx.fillStyle = 'rgba(255,255,255,.42)'; ctx.fill(new Path2D(k.hl)); }
-    if (k.bead) { ctx.fillStyle = 'rgba(255,255,255,.75)'; ctx.beginPath(); ctx.ellipse(k.bead[0], k.bead[1], k.bead[2], k.bead[2] * 1.3, 0, 0, 7); ctx.fill(); }
-  }
-  const base = Math.max(110, Math.min(220, Math.min(W, H) / 4.5));
-  
-  for (let i = 0; i < 3; i++) {                          // flicked splatter
-    const cx = rnd() * W, cy = rnd() * H, col = PAINT[Math.floor(rnd() * 6)];
-    for (let k = 0; k < 16; k++) { const a = rnd() * 6.28, d = rnd() ** 1.8 * base * .6, r = .6 + rnd() ** 2.5 * 4, px = cx + Math.cos(a) * d, py = cy + Math.sin(a) * d * .8;
-      const rg = ctx.createRadialGradient(px - r * .3, py - r * .3, 0, px, py, r); rg.addColorStop(0, mix(col, .4, 'w')); rg.addColorStop(.5, col); rg.addColorStop(1, mix(col, .4, 'k'));
-      ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(px, py, r, 0, 7); ctx.fill(); }
-  }
-  for (let i = 0; i < 2; i++) {                          // a loose length of real tape
-    let tx = rnd() * W, ty = H * (.3 + rnd() * .6); ctx.beginPath(); ctx.moveTo(tx, ty);
-    for (let k = 0; k < 4; k++) { const cx = tx + (rnd() - .5) * W * .4, cy = ty + (rnd() - .5) * H * .4; tx += (rnd() - .5) * W * .35; ty += (rnd() - .5) * H * .3; ctx.quadraticCurveTo(cx, cy, tx, ty); }
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 3; ctx.strokeStyle = '#2a1b12'; ctx.lineWidth = 3.2; ctx.stroke(); ctx.restore();
-    ctx.strokeStyle = 'rgba(190,150,110,.45)'; ctx.lineWidth = 1; ctx.stroke();
-  }
-  // heavy curtain of dense paint along the top of the wall
-  const PT = [1, 2, 3, 4, 5, 6].map(i => v('--p' + i));
-  function run(x, y, w, L, col, sd) {
-    const k = dripShape(x, y, y + L, w, sd, {thin: .8, bump: 1.8}), g = ctx.createLinearGradient(x - w * .6, 0, x + w * .6, 0);
-    g.addColorStop(0, mix(col, .55, 'k')); g.addColorStop(.18, col); g.addColorStop(.34, mix(col, .38, 'w')); g.addColorStop(.52, col); g.addColorStop(1, mix(col, .6, 'k'));
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 4; ctx.fillStyle = g; ctx.fill(new Path2D(k.d)); ctx.restore();
-    ctx.strokeStyle = 'rgba(0,0,0,.25)'; ctx.lineWidth = .8; ctx.stroke(new Path2D(k.d));
-    if (k.hl) { ctx.fillStyle = 'rgba(255,255,255,.38)'; ctx.fill(new Path2D(k.hl)); }
-    if (k.bead) { ctx.fillStyle = 'rgba(255,255,255,.8)'; ctx.beginPath(); ctx.ellipse(k.bead[0], k.bead[1], k.bead[2], k.bead[2] * 1.3, 0, 0, 7); ctx.fill(); }
-  }
-  let cx = -10, ci = 0;
-  while (cx < W + 10) {
-    const col = PT[ci++ % 6], seg = 90 + rnd() * 220, band = 14 + rnd() * 22;
-    const g = ctx.createLinearGradient(0, 0, 0, band + 6); g.addColorStop(0, mix(col, .45, 'k')); g.addColorStop(.55, mix(col, .15, 'w')); g.addColorStop(1, mix(col, .35, 'k'));
-    ctx.save(); ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 4;
-    ctx.beginPath(); ctx.moveTo(cx - 4, -5); ctx.lineTo(cx + seg + 4, -5); ctx.lineTo(cx + seg + 4, band);
-    for (let t = seg; t >= 0; t -= 8) ctx.lineTo(cx + t, band + Math.sin((cx + t) * .045 + ci) * 3.5);
-    ctx.closePath(); ctx.fillStyle = g; ctx.fill(); ctx.restore();
-    ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx + 6, band * .45); ctx.lineTo(cx + seg - 6, band * .45); ctx.stroke();
-    for (let k = 0, n = 1 + Math.floor(rnd() * 3); k < n; k++) {
-      const w = 12 + rnd() * 18, L = 40 + rnd() ** 1.7 * H * (rnd() < .25 ? .85 : .35);
-      run(cx + seg * (.12 + rnd() * .76), band - 4, w, L, col, ci * 13 + k);
-    }
-    cx += seg;
-  }
-  // gallery light: warm pool from above, darker corners
-  const sp = ctx.createRadialGradient(W / 2, H * .12, 0, W / 2, H * .35, Math.max(W, H) * .75);
-  sp.addColorStop(0, dark ? 'rgba(255,214,160,.16)' : 'rgba(255,244,225,.28)'); sp.addColorStop(1, 'rgba(255,244,225,0)'); ctx.fillStyle = sp; ctx.fillRect(0, 0, W, H);
+  const sp = ctx.createRadialGradient(W / 2, H * .1, 0, W / 2, H * .35, Math.max(W, H) * .75);
+  sp.addColorStop(0, dark ? 'rgba(255,214,160,.12)' : 'rgba(255,248,235,.45)'); sp.addColorStop(1, 'rgba(255,244,225,0)'); ctx.fillStyle = sp; ctx.fillRect(0, 0, W, H);
   const vg = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .3, W / 2, H / 2, Math.max(W, H) * .8);
-  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, dark ? 'rgba(0,0,0,.6)' : 'rgba(40,25,10,.22)'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, dark ? 'rgba(0,0,0,.55)' : 'rgba(40,25,10,.16)'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
 }
 /* material textures: wood grain for the frame, cotton paper for the mat and cards */
 (function textures() {
@@ -1825,6 +1752,9 @@ function drawArt() {
   for (let i = 0; i < 140; i++) { const x = rnd() * 240, y = rnd() * 240, a = rnd() * 6.28, l = 4 + rnd() * 14; pc.lineWidth = .4 + rnd() * .6; pc.beginPath(); pc.moveTo(x, y); pc.quadraticCurveTo(x + Math.cos(a) * l * .5 + rnd() * 3, y + Math.sin(a) * l * .5, x + Math.cos(a) * l, y + Math.sin(a) * l); pc.stroke(); }
   root.style.setProperty('--wood', `url(${w.toDataURL('image/jpeg', .85)})`);
   root.style.setProperty('--paper', `url(${p.toDataURL()})`);
+  const gn = document.createElement('canvas'); gn.width = gn.height = 160; const gc = gn.getContext('2d'), gd = gc.createImageData(160, 160);
+  for (let i = 0; i < gd.data.length; i += 4) { const v = rnd() * 255; gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = v; gd.data[i + 3] = 40; }
+  gc.putImageData(gd, 0, 0); root.style.setProperty('--grain', `url(${gn.toDataURL()})`);
 })();
 function panelDrips() { document.querySelectorAll('.drips').forEach(e => e.remove()); }
 let artT; addEventListener('resize', () => { clearTimeout(artT); artT = setTimeout(() => { drawArt(); panelDrips(); }, 160); });
