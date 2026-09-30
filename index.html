@@ -597,11 +597,6 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 :root:not(#pop):not(#real) #deckEl .plate>*{min-width:0}:root:not(#pop):not(#real) #deckEl .stage>*{min-width:0}
 :root:not(#pop):not(#real) #deckEl .remote{margin:0 0 22px;padding:10px 12px 12px;border-radius:12px}
 :root:not(#pop):not(#real) #deckEl .remote>.print{display:block;margin:0 0 6px 2px}
-:root:not(#pop):not(#real) #deckEl .vfd{display:grid;grid-template-columns:auto auto auto minmax(0,1fr);grid-template-areas:"ind main sub msg";align-items:center;gap:6px 30px;padding:14px 20px}
-:root:not(#pop):not(#real) #deckEl .vfd-ind{grid-area:ind;display:grid;gap:3px;font-size:12px}
-:root:not(#pop):not(#real) #deckEl .vfd-main{grid-area:main;margin:0;gap:22px;flex-wrap:nowrap}
-:root:not(#pop):not(#real) #deckEl .vfd-sub{grid-area:sub;display:grid;gap:4px;font-size:15px;border-left:1px solid rgba(255,255,255,.08);padding-left:22px}
-:root:not(#pop):not(#real) #deckEl .vfd-msg{grid-area:msg;margin:0;font-size:20px;white-space:normal;line-height:1.25;text-align:right;border-left:1px solid rgba(255,255,255,.08);padding-left:22px}
 :root:not(#pop):not(#real) #deckEl .stage{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,2.3fr) minmax(150px,1fr);gap:26px;align-items:start}
 :root:not(#pop):not(#real) #deckEl .side{display:grid;gap:10px;justify-items:center;padding-top:4px}
 :root:not(#pop):not(#real) #deckEl .side>.print{justify-self:start}
@@ -609,8 +604,8 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 :root:not(#pop):not(#real) #deckEl .side .knobbox{margin-top:16px}
 :root:not(#pop):not(#real) #deckEl .unit-col{display:grid;gap:0}
 @media(max-width:900px){:root:not(#pop):not(#real) #deckEl .stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}:root:not(#pop):not(#real) #deckEl .vfd-main{flex-wrap:wrap;gap:14px}:root:not(#pop):not(#real) #deckEl .unit-col{grid-column:1/-1;order:-1}
-  :root:not(#pop):not(#real) #deckEl .vfd{grid-template-columns:1fr auto;grid-template-areas:"main sub" "ind ind" "msg msg"}:root:not(#pop):not(#real) #deckEl .vfd-ind{display:flex;flex-wrap:wrap;gap:8px}:root:not(#pop):not(#real) #deckEl .vfd-msg{text-align:left;border:0;padding:0}}
-@media(max-width:520px){:root:not(#pop):not(#real) .frame{padding:10px}:root:not(#pop):not(#real) .mat{padding:22px 12px 16px}:root:not(#pop):not(#real) #deckEl .karc{zoom:.78}:root:not(#pop):not(#real) #deckEl .stage{gap:10px}:root:not(#pop):not(#real) #deckEl .plate{padding:30px 12px 22px}:root:not(#pop):not(#real) #deckEl .vfd{grid-template-columns:1fr;grid-template-areas:"main" "sub" "ind" "msg";padding:12px}:root:not(#pop):not(#real) #deckEl .vfd-sub{display:flex;flex-wrap:wrap;border:0;padding:0}}
+  }
+@media(max-width:520px){:root:not(#pop):not(#real) .frame{padding:10px}:root:not(#pop):not(#real) .mat{padding:22px 12px 16px}:root:not(#pop):not(#real) #deckEl .karc{zoom:.78}:root:not(#pop):not(#real) #deckEl .stage{gap:10px}:root:not(#pop):not(#real) #deckEl .plate{padding:30px 12px 22px}}
 
 /* tape window: grab it */
 :root:not(#pop):not(#real) #deckEl .well{cursor:grab;touch-action:none}:root:not(#pop):not(#real) #deckEl .well.scratching{cursor:grabbing}
@@ -644,6 +639,34 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
   filter:drop-shadow(0 1px 0 rgba(255,255,255,.75));transform:rotate(var(--sr,12deg))}   /* Phillips recess */
 :root:not(#pop):not(#real) .b2,:root:not(#pop):not(#real) .console>.s2{--sr:47deg}:root:not(#pop):not(#real) .b3,:root:not(#pop):not(#real) .console>.s3{--sr:-21deg}:root:not(#pop):not(#real) .b4,:root:not(#pop):not(#real) .console>.s4{--sr:76deg}
 :root:not(#pop):not(#real)[data-theme=dark] .bolt,:root:not(#pop):not(#real)[data-theme=dark] .console>.screw{box-shadow:0 0 0 1.5px rgba(0,0,0,.7),0 0 0 3px rgba(255,255,255,.18),2px 4px 6px rgba(0,0,0,.7),inset 0 -1px 1px rgba(0,0,0,.4),inset 0 1px 1px rgba(255,255,255,.8)}
+
+/* ================= thin display: one line of glass in a machined aluminium bezel ================= */
+:root:not(#pop):not(#real) #deckEl .remote{margin:0 0 20px;padding:5px;border-radius:9px;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,rgba(0,0,0,.035) 1px 2px,transparent 2px 3px),linear-gradient(180deg,#e9ebed,#c3c7cb 48%,#aeb3b8 52%,#d5d8db);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),inset 0 -1px 0 rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.7),0 10px 16px -10px rgba(0,0,0,.45)}
+:root:not(#pop):not(#real) #deckEl .remote>.print{display:none}
+:root:not(#pop):not(#real) #deckEl .vfd{position:relative;display:flex;align-items:center;gap:0 22px;padding:9px 18px;border-radius:5px;overflow:hidden;min-height:0;
+  background:radial-gradient(140% 220% at 50% -40%,#1a1c1b,#070808 60%);box-shadow:inset 0 0 0 1px #000,inset 0 2px 8px rgba(0,0,0,.95),inset 0 -1px 0 rgba(255,255,255,.05)}
+:root:not(#pop):not(#real) #deckEl .vfd::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(172deg,rgba(255,255,255,.075) 0 38%,transparent 38.5%),linear-gradient(90deg,transparent 60%,rgba(255,255,255,.035) 75%,transparent 90%)}   /* the glass */
+:root:not(#pop):not(#real) #deckEl .vfd-ind{order:0;display:grid;grid-template-columns:auto auto;gap:1px 8px;font-size:10px;line-height:1.15;flex:none}
+:root:not(#pop):not(#real) #deckEl .vfd-main{order:1;display:flex;align-items:center;gap:16px;margin:0;flex:none;flex-wrap:nowrap}
+:root:not(#pop):not(#real) #deckEl .vfd-main>div{display:flex;align-items:center;gap:6px}
+:root:not(#pop):not(#real) #deckEl .vfd-main small{font-size:11px;opacity:.55;writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.12em}
+:root:not(#pop):not(#real) #deckEl .vfd-main .sevseg{height:24px;width:auto}
+:root:not(#pop):not(#real) #deckEl .vfd-sub{order:2;display:flex;gap:14px;font-size:14px;border-left:1px solid rgba(255,255,255,.08);padding-left:18px;flex:none}
+:root:not(#pop):not(#real) #deckEl .vfd-msg{order:3;flex:1;min-width:0;margin:0;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;border:0;padding:0}
+:root:not(#pop):not(#real) #deckEl .vfd-sub,:root:not(#pop):not(#real) #deckEl .vfd-msg,:root:not(#pop):not(#real) #deckEl .vfd-ind span{letter-spacing:.1em}
+:root:not(#pop):not(#real)[data-theme=dark] #deckEl .remote{background:repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),linear-gradient(180deg,#4a4d51,#2c2f32 50%,#3b3e42);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 0 1px #000,0 10px 16px -10px rgba(0,0,0,.8)}
+@media(max-width:1100px){:root:not(#pop):not(#real) #deckEl .vfd-ind{display:none}}
+@media(max-width:900px){:root:not(#pop):not(#real) #deckEl .vfd{display:flex;flex-wrap:wrap;gap:6px 16px}:root:not(#pop):not(#real) #deckEl .vfd-main{flex-wrap:nowrap}:root:not(#pop):not(#real) #deckEl .vfd-sub{border:0;padding:0}:root:not(#pop):not(#real) #deckEl .vfd-msg{flex-basis:100%;text-align:left}}
+@media(max-width:520px){:root:not(#pop):not(#real) #deckEl .vfd{padding:8px 12px}:root:not(#pop):not(#real) #deckEl .vfd-main{gap:10px}:root:not(#pop):not(#real) #deckEl .vfd-main .sevseg{height:20px}:root:not(#pop):not(#real) #deckEl .vfd-sub{font-size:12px;gap:10px}:root:not(#pop):not(#real) #deckEl .vfd-msg{font-size:13px}}
+
+@media(max-width:520px){
+  :root:not(#pop):not(#real) #deckEl .unit-top>.print{display:none}:root:not(#pop):not(#real) #deckEl .unit-top{justify-content:center}:root:not(#pop):not(#real) #deckEl .unit-sw{flex-wrap:nowrap;gap:6px}:root:not(#pop):not(#real) #deckEl .unit-sw .latch,:root:not(#pop):not(#real) #deckEl .unit-sw .ejectkey{padding:6px 8px;letter-spacing:.1em}
+  #drop>.mono{display:none}   /* the long feature list; the section title already says it */
+  :root:not(#pop):not(#real) #deckEl .vfd-msg{display:none}  /* the cassette label shows the track name right below */
+}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
