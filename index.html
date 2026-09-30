@@ -1571,8 +1571,9 @@ $('ytLoad').onclick = async () => {
     const r = await fetch('/api/yt?list=' + id), j = await r.json().catch(() => ({}));
     if (!r.ok) throw Error((j.error || r.status) + (j.tried ? ` [${j.tried.join(' · ')}]` : ''));
     const items = j.items.map(x => ({src: 'youtube', ...x}));
-    PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length})`, load: async () => items});
-    fillPlaylists(); $('plist').value = 'yt:' + id; showPlaylist();
+    PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length}${j.partial ? ' newest only — needs API key' : ''})`, load: async () => items});
+    fillPlaylists(); $('plist').value = 'yt:' + id; await showPlaylist();
+    if (j.partial) sstatus(`YouTube only gave the newest ${items.length} tracks — the site owner needs to add a YouTube API key for full playlists`);
   } catch (e) { fail('YouTube', e); }
 };
 $('ytUrl').onkeydown = e => e.key == 'Enter' && $('ytLoad').click();
