@@ -973,6 +973,7 @@ async function runJobs(jobs, failWord, say = status) {
   busy = false; setTimeout(() => $('prog').style.display = 'none', 600);
   say(`Done · ${jobs.length - fails} tracks ready${fails ? ` · ${fails} ${failWord}` : ''} · library ${LIB.length}`);
   rebuild();
+  return fails;
 }
 const status = s => { $('status').textContent = s; if (busy) vmsg(s.split(' · ')[0]); };
 $('fpick').onchange = e => { load([...e.target.files]); e.target.value = ''; };
@@ -1428,10 +1429,11 @@ async function sortList(items, say) {
   const how = await askMerge(items.length); if (how == 'cancel') return say('Cancelled'); if (how == 'fresh') resetLib();
   const seen = new Set(LIB.map(t => t.id)), todo = items.slice(0, 1000).filter(it => !seen.has(pvId(it)) && seen.add(pvId(it)));
   const left = await fromStreams(todo, say), got = todo.length - left.length;
-  if (!left.length) return say(`Done · ${got} tracks from streaming data · library ${LIB.length}`);
+  if (!left.length) return say(`Done · ${got} of ${items.length} tracks added from catalogue data · library ${LIB.length}`);
   // ponytail: misses fall back to 30-s preview analysis, capped at 300 per run
   say(`${got} from streaming data · analysing ${Math.min(left.length, 300)} more from previews…`);
-  await runJobs(left.slice(0, 300).map(remoteJob), 'had no preview', say);
+  const n = Math.min(left.length, 300), fails = await runJobs(left.slice(0, 300).map(remoteJob), 'had no preview', say) ?? 0;
+  say(`Done · ${got + n - fails} of ${items.length} tracks added — ${got} from catalogue data, ${n - fails} analysed from previews${fails ? `, ${fails} had no preview` : ''}${left.length > 300 ? `, ${left.length - 300} left (load again with Merge)` : ''} · library ${LIB.length}`);
 }
 function parseLines(text) {
   return text.split(/\r?\n/).map(l => l.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean).map(l => {
