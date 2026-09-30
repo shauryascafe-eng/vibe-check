@@ -550,6 +550,38 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 .svc{display:inline-flex;align-items:center;gap:6px;background:none;border:0;padding:4px 2px;cursor:pointer;color:color-mix(in srgb,var(--ink) 55%,transparent);font:500 10px 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;transition:color .15s}
 .svc i{width:15px;height:15px;background:currentColor;-webkit-mask:var(--u) center/contain no-repeat;mask:var(--u) center/contain no-repeat}
 .svc:hover,.svc.on{color:var(--ink)}.svc.on{color:var(--acc,var(--c1))}
+
+/* ================= every section is a machined acrylic plate, bolted to the wall ================= */
+.wrap{counter-reset:plate}
+:root:not(#pop):not(#real) .console{position:relative;margin-top:56px;padding:44px 48px 40px;border-radius:10px;border:1px solid rgba(255,255,255,.9);
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.34) 40%,transparent 48%),linear-gradient(160deg,rgba(255,255,255,.62),rgba(255,255,255,.36) 55%,rgba(255,255,255,.46));
+  -webkit-backdrop-filter:blur(18px) saturate(1.15);backdrop-filter:blur(18px) saturate(1.15);
+  box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 rgba(0,0,0,.08),inset 1px 0 0 rgba(255,255,255,.7),inset -1px 0 0 rgba(0,0,0,.05),
+    0 0 0 1px rgba(0,0,0,.06),0 2px 0 rgba(255,255,255,.55),0 3px 1px -1px rgba(0,0,0,.12),0 26px 44px -20px rgba(0,0,0,.45),0 8px 14px -8px rgba(0,0,0,.2)}
+:root:not(#pop):not(#real) .console::before{content:"";position:absolute;inset:6px;border-radius:6px;pointer-events:none;border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 0 0 1px rgba(0,0,0,.035)}   /* the polished bevel, 6 mm in */
+:root:not(#pop):not(#real) .console>.screw{display:block;position:absolute;z-index:8;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#d3d7dc 40%,#858c94 75%,#50565d);
+  box-shadow:2px 4px 5px rgba(0,0,0,.35),inset 0 -1px 2px rgba(0,0,0,.4)}
+:root:not(#pop):not(#real) .console>.screw::after{content:"";position:absolute;inset:5px;height:auto;border-radius:1px;transform:none;background:#4a5057;
+  clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}   /* hex socket */
+:root:not(#pop):not(#real) .console>.s1{top:16px;left:16px}:root:not(#pop):not(#real) .console>.s2{top:16px;right:16px;left:auto}:root:not(#pop):not(#real) .console>.s3{bottom:16px;left:16px;top:auto}:root:not(#pop):not(#real) .console>.s4{bottom:16px;right:16px;top:auto;left:auto}
+:root:not(#pop):not(#real) .console>.s2::after{transform:rotate(17deg)}:root:not(#pop):not(#real) .console>.s3::after{transform:rotate(-24deg)}:root:not(#pop):not(#real) .console>.s4::after{transform:rotate(38deg)}
+/* titles are printed on the plate, numbered like a panel legend */
+:root:not(#pop):not(#real) h2{counter-increment:plate;font:600 13px/1 Inter,system-ui,sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#1c1b19;background:none;padding:0 0 0 2px;margin:0 0 10px;
+  border:0;box-shadow:none;transform:none;clip-path:none;display:flex;align-items:center;gap:12px}
+:root:not(#pop):not(#real) h2::before{content:counter(plate,decimal-leading-zero);font:500 10px 'JetBrains Mono',monospace;letter-spacing:.1em;color:#fff;background:#1c1b19;border-radius:3px;padding:4px 6px}
+:root:not(#pop):not(#real) .console .rule{letter-spacing:.18em;color:#5d5850}
+/* inner areas are recessed wells milled into the acrylic */
+:root:not(#pop):not(#real) .drop,:root:not(#pop):not(#real) .paste{border:0;border-radius:8px;background:rgba(255,255,255,.4);box-shadow:inset 0 2px 5px rgba(0,0,0,.1),inset 0 0 0 1px rgba(0,0,0,.06),0 1px 0 rgba(255,255,255,.8)}
+:root:not(#pop):not(#real) .drop.over{background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 2px var(--te,var(--acc)),inset 0 2px 5px rgba(0,0,0,.1)}
+:root:not(#pop):not(#real) .console table{background:transparent}
+/* smoked acrylic after dark */
+:root:not(#pop):not(#real)[data-theme=dark] .console{border-color:rgba(255,255,255,.14);
+  background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.06) 40%,transparent 48%),linear-gradient(160deg,rgba(40,38,36,.72),rgba(18,17,16,.62) 55%,rgba(28,27,25,.68));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -1px 0 rgba(0,0,0,.5),0 0 0 1px rgba(0,0,0,.5),0 26px 44px -20px rgba(0,0,0,.8)}
+:root:not(#pop):not(#real)[data-theme=dark] .console::before{border-color:rgba(255,255,255,.07);box-shadow:none}
+:root:not(#pop):not(#real)[data-theme=dark] h2{color:#efebe4}:root:not(#pop):not(#real)[data-theme=dark] h2::before{background:#efebe4;color:#1c1b19}:root:not(#pop):not(#real)[data-theme=dark] .console .rule{color:#a39c91}
+:root:not(#pop):not(#real)[data-theme=dark] .drop,:root:not(#pop):not(#real)[data-theme=dark] .paste{background:rgba(0,0,0,.28);box-shadow:inset 0 2px 6px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.05),0 1px 0 rgba(255,255,255,.05)}
+@media(max-width:600px){:root:not(#pop):not(#real) .console{padding:40px 18px 34px}:root:not(#pop):not(#real) .console>.s1,:root:not(#pop):not(#real) .console>.s3{left:10px}:root:not(#pop):not(#real) .console>.s2,:root:not(#pop):not(#real) .console>.s4{right:10px}}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
