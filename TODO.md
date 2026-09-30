@@ -46,3 +46,7 @@
 ## Automatic streaming data (v19)
 - [ ] Vercel → Settings → Environment Variables: `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` (same Spotify app; lets Apple/YouTube/pasted songs be matched to catalogue data). Spotify playlists work without them.
 - [ ] Test: pick a playlist → numbers fill in automatically (◇ = catalogue data, ◦ = preview analysis)
+
+## v26 — YouTube only
+- Spotify / Apple Music removed (API limits). `api/apple-token.js` deleted; `SPOTIFY_*` / `APPLE_*` env vars in Vercel can be removed.
+- Library now lasts per tab (sessionStorage); merge-or-fresh prompt when adding; keyboard shortcuts (press ?).

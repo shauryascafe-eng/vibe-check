@@ -164,13 +164,7 @@ tr[draggable]{cursor:grab}tr.drag{opacity:.4}tr.dropto td{border-top:2px solid v
 audio{margin-top:16px;width:100%;max-width:520px;height:36px}
 .x{font:700 13px 'JetBrains Mono',monospace;background:none;border:0;color:var(--dim);cursor:pointer}.x:hover{color:#c0392b}
 .empty{text-align:center;padding:40px 10px}
-.pbar[hidden]{display:none}
-.pbar{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--deck);color:#f3e6cf;box-shadow:0 -8px 24px #0005;z-index:10}
-.pbar .pnow{flex:1;min-width:0}.pbar .pnow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pbar small{color:#a8987f}
-.pctl{display:flex;gap:6px}#ytbox{width:200px;height:200px;border-radius:8px}
-body:has(.pbar:not([hidden])){padding-bottom:240px}
 #ytUrl{flex:1;min-width:220px;font:14px Inter,system-ui,sans-serif;background:var(--panel);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:9px 12px}
-#sout .act button{font:700 14px 'JetBrains Mono',monospace;background:none;border:1px solid var(--edge);color:var(--ink);border-radius:6px;padding:4px 9px;cursor:pointer}
 .wave{width:100%;height:70px;display:block;background:var(--well);border-radius:8px}
 .spark{margin:16px 0 0}.spark figcaption{margin-bottom:4px}.spark svg{width:100%;height:auto;overflow:visible}.spark text{font:500 11px 'JetBrains Mono',monospace;fill:var(--dim)}.spark .grid{stroke:var(--edge);stroke-width:1}
 .dup{font:700 10px 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#c0392b;border:1px solid currentColor;border-radius:4px;padding:0 4px}
@@ -234,7 +228,6 @@ body:has(.pbar:not([hidden])){padding-bottom:240px}
 :root:not(#pop) .wave{border:2.5px solid var(--line);border-radius:12px}
 :root:not(#pop) .detail td{background:color-mix(in srgb,var(--c3) 7%,var(--panel))!important}
 :root:not(#pop) .dup{color:var(--c1)}
-:root:not(#pop) .pbar{background:var(--c5);border-top:3px solid #1B1414;color:#fff}
 /* deck as a pop-art object */
 :root:not(#pop) .deck{background:radial-gradient(circle,#1B141426 1.3px,transparent 1.7px) 0 0/11px 11px,var(--c2);border:3px solid #1B1414;border-radius:26px;box-shadow:12px 12px 0 var(--line);color:#1B1414}
 :root:not(#pop) .deck .screw{display:none}
@@ -387,7 +380,6 @@ html,body{overflow-x:clip}
 :root:not(#pop):not(#real) .tiles div{border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
 :root:not(#pop):not(#real) .wave{border:0;border-radius:8px;box-shadow:inset 0 1px 4px rgba(0,0,0,.2)}
 :root:not(#pop):not(#real) .detail td{background:color-mix(in srgb,var(--c3) 5%,var(--panel))!important}
-:root:not(#pop):not(#real) .pbar{background:linear-gradient(#2d2925,#1d1a17);border-top:1px solid #000;color:#f1ebe0}
 /* paint is glossy and shaded, no outlines */
 :root:not(#pop):not(#real) .pour path,:root:not(#pop):not(#real) .pour ellipse,:root:not(#pop):not(#real) .pour circle,:root:not(#pop):not(#real) .drips path,:root:not(#pop):not(#real) .drips ellipse,:root:not(#pop):not(#real) .landing path{stroke:none}
 :root:not(#pop):not(#real) .pour .pg,:root:not(#pop):not(#real) .drips g,:root:not(#pop):not(#real) .drips .band,:root:not(#pop):not(#real) .landing svg{filter:url(#pshadow)}
@@ -545,6 +537,14 @@ header{position:relative;z-index:50}
 .paste h3{margin:0;font-size:18px}.paste p{margin:0;letter-spacing:.12em;line-height:1.7}
 .paste .row{display:flex;gap:10px;flex-wrap:wrap}
 #plain{width:100%;font:14px/1.5 'JetBrains Mono',monospace;background:var(--k-bg,var(--panel));color:var(--ink);border:0;border-radius:8px;padding:12px;box-shadow:inset 0 0 0 1px var(--k-edge,var(--edge)),inset 0 1px 3px rgba(0,0,0,.08);resize:vertical}
+
+dialog{border:0;border-radius:12px;padding:22px 26px;max-width:min(440px,calc(100vw - 32px));background:var(--k-bg,#f4f3f0);color:var(--k-ink,#1c1b19);box-shadow:0 30px 60px -20px rgba(0,0,0,.55)}
+dialog::backdrop{background:rgba(20,16,12,.45)}
+dialog h3{margin:0 0 8px;font:700 18px Inter,system-ui,sans-serif}dialog p{margin:0 0 16px;letter-spacing:.06em;line-height:1.6}
+dialog .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.keys-t{border-collapse:collapse;font-size:14px}.keys-t td{padding:5px 14px 5px 0;border:0}
+kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;background:var(--k-edge,#e4e2dd);box-shadow:0 1px 0 rgba(0,0,0,.25)}
+#ytRow{margin-top:12px}#ytRow[hidden]{display:none}#ytUrl{flex:1;min-width:220px}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -643,7 +643,7 @@ header{position:relative;z-index:50}
           </div>
           <div class=ribbon aria-hidden=true></div>
           <div class=keys><button class="tkey" id=tpRew aria-label="Rewind / previous track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 6v12L3 12zM21 6v12l-9-6z"/></svg><span>Rew</span></button><button class="tkey play" id=tpPlay aria-label="Play"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M7 5v14l12-7z"/></svg><span>Play</span></button><button class="tkey" id=tpPause aria-label="Pause"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>Pause</span></button><button class="tkey" id=tpStop aria-label="Stop"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6h12v12H6z"/></svg><span>Stop</span></button><button class="tkey" id=tpFf aria-label="Fast forward / next track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 6v12l9-6zM12 6v12l9-6z"/></svg><span>F.Fwd</span></button></div>
-          <div class=patch><span class=print>Patch bay · jump to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a><a class=jack href="#sec-stream" style="--jc:var(--c6)" aria-label="Stream: go to Streaming"><span>Stream</span><b id=jst3>—</b><i></i></a></div></div>
+          <div class=patch><span class=print>Patch bay · jump to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a></div></div>
         </div>
         <div class=side-col>
           <div class=remote><span class=print>Remote LCD</span><div class=vfd>
@@ -692,14 +692,19 @@ header{position:relative;z-index:50}
 <section class=console>
   <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
   <h2>Load tapes</h2>
-  <div class="rule mono">Bulk analyse · mp3 wav flac m4a aiff ogg · stays on your Mac</div>
+  <div class="rule mono">Bulk analyse · mp3 wav flac m4a aiff ogg · YouTube playlists · press ? for shortcuts</div>
   <div class=drop id=drop>
     <h3>Drop tracks or whole folders here</h3>
     <div class=mono>Key · Camelot · BPM · Duration · Danceability · Energy · Happiness · Acousticness · Instrumental · Loudness · Brightness · Busyness · Dynamics</div>
     <div class=row>
       <label class="btn solid">＋ Add files<input type=file id=fpick multiple accept="audio/*,.flac,.aiff,.aif" hidden></label>
       <label class=btn>▤ Add folder<input type=file id=dpick webkitdirectory multiple hidden></label>
+      <button class=btn id=ytOpen aria-expanded=false aria-controls=ytRow>▶ YouTube playlist</button>
       <button class=btn id=clear>✕ Clear library</button>
+    </div>
+    <div class=row id=ytRow hidden>
+      <input id=ytUrl placeholder="Paste a public YouTube / YouTube Music playlist link" aria-label="YouTube playlist link">
+      <button class="btn solid" id=ytLoad>Load</button>
     </div>
     <div class=prog id=prog><i></i></div>
     <div class=mono id=status></div>
@@ -746,33 +751,21 @@ header{position:relative;z-index:50}
     <th>Match</th><th>Transition</th><th></th></tr></thead><tbody id=out></tbody></table></div>
 </section>
 
-<section class=console id=streaming>
-  <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
-  <h2>Streaming</h2>
-  <div class="rule mono">Spotify · Apple Music · YouTube · play here, match to your analysed tracks</div>
-  <div class=tools>
-    <button class="btn solid" id=spConnect>● Connect Spotify</button>
-    <button class=btn id=amConnect> Connect Apple Music</button>
-    <input id=ytUrl placeholder="Paste a YouTube / YouTube Music playlist link" aria-label="YouTube playlist link">
-    <button class=btn id=ytLoad>▶ Load YouTube playlist</button>
-  </div>
-  <div class=tools style="margin-top:12px">
-    <select id=plist aria-label="Playlist"><option value="">Choose a playlist…</option></select>
-    <span style="flex:1"></span>
-    <button class="btn solid" id=anaPl>⚡ Analyse this playlist</button>
-    <button class=btn id=toSp>⇪ Save Arrange order to Spotify</button><button class=btn id=toAm>⇪ Save to Apple Music</button>
-  </div>
-  <div class=mono id=sstatus style="margin-top:12px"></div>
-  <div style="overflow-x:auto"><table><thead><tr class=mono><th>#</th><th>Track</th><th>Source</th><th>Your analysis</th><th></th></tr></thead><tbody id=sout></tbody></table></div>
-</section>
 </div>
 
-<div class=pbar id=pbar hidden>
-  <span class=key id=psrc></span>
-  <div class=pnow><b id=ptitle></b><small id=partist></small></div>
-  <div class=pctl><button class=btn id=pprev aria-label="Previous">⏮</button><button class="btn solid" id=ptog aria-label="Play or pause">⏯</button><button class=btn id=pnext aria-label="Next">⏭</button></div>
-  <div id=ytbox></div>
-</div>
+<dialog id=mergeDlg><form method=dialog>
+  <h3>Add to your current list?</h3>
+  <p class=mono id=mergeMsg></p>
+  <div class=row><button class="btn solid" value=merge>Merge</button><button class=btn value=fresh>Start fresh</button><button class=btn value=cancel>Cancel</button></div>
+</form></dialog>
+<dialog id=keysDlg><form method=dialog>
+  <h3>Keyboard shortcuts</h3>
+  <table class=keys-t><tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr><tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next track</td></tr>
+  <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Volume</td></tr><tr><td><kbd>S</kbd></td><td>Stop</td></tr><tr><td><kbd>E</kbd></td><td>Eject</td></tr>
+  <tr><td><kbd>K</kbd></td><td>Key lock</td></tr><tr><td><kbd>A</kbd></td><td>Auto next</td></tr><tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Load · Taste · Arrange</td></tr>
+  <tr><td><kbd>Y</kbd></td><td>YouTube playlist</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
+  <div class=row><button class="btn solid" value=ok>Got it</button></div>
+</form></dialog>
 
 <script>
 const ESS = 'https://cdn.jsdelivr.net/npm/essentia.js@0.1.3/dist/';
@@ -788,8 +781,10 @@ const cam = s => [+s.slice(0, -1), s.slice(-1)];
 const compat = (a, b) => { const [n, l] = cam(a), [m, k] = cam(b), d = (n - m + 12) % 12; return n == m || (l == k && (d == 1 || d == 11)); };
 const title = t => t.file.replace(/\.[^.]+$/, '').replace(/^\d+\s*[-.]?\s+/, '').replace(/^YTDown\.com_YouTube_|_Media_.*$/g, '').replace(/_/g, ' ').split(' - ').pop().replace(/^([^ ]*)$/, x => x.replace(/-/g, ' '));
 
-let LIB = []; try { LIB = JSON.parse(localStorage.getItem('vibecheck') || '[]').filter(t => t.v == 3); } catch {}
-const save = () => { try { localStorage.setItem('vibecheck', JSON.stringify(LIB)); } catch {} };
+// the list lives for this tab only (survives a reload, not a restart); old saved libraries are cleared
+try { localStorage.removeItem('vibecheck'); } catch {}
+let LIB = []; try { LIB = JSON.parse(sessionStorage.getItem('vibecheck') || '[]').filter(t => t.v == 3); } catch {}
+const save = () => { try { sessionStorage.setItem('vibecheck', JSON.stringify(LIB)); } catch {} };
 const FILES = new Map(), URLS = new Map();
 const R = {}, T = {}, W = {}, el = {};
 let ref = null, mode = 'match', sortKey = 'bpm', sortDir = 1, custom = [], open = null, busy = false;
@@ -944,9 +939,18 @@ async function walk(entry, out) {
   const rd = entry.createReader(); let batch;
   do { batch = await new Promise(r => rd.readEntries(r, () => r([]))); for (const e of batch) await walk(e, out); } while (batch.length);
 }
+function askMerge(n) {
+  if (!LIB.length) return Promise.resolve('merge');
+  const d = $('mergeDlg'); $('mergeMsg').textContent = `Your list has ${LIB.length} track${LIB.length == 1 ? '' : 's'}. Add ${n == 1 ? 'this one' : `these ${n}`} to it, or clear it and start with just ${n == 1 ? 'this one' : 'these'}?`;
+  d.returnValue = 'cancel'; d.showModal();
+  return new Promise(ok => d.addEventListener('close', () => ok(d.returnValue || 'cancel'), {once: true}));
+}
+function resetLib() { LIB = []; custom = []; ref = null; save(); rebuild(); }
 async function load(files) {
   files = files.filter(f => AUDIO.test(f.name));
   if (!files.length) return status('No audio files found');
+  if (busy) return status('Already analysing — wait for this batch');
+  const how = await askMerge(files.length); if (how == 'cancel') return; if (how == 'fresh') resetLib();
   return runJobs(files.map(f => ({id: f.name + '|' + f.size, name: f.name, run: () => { FILES.set(f.name + '|' + f.size, f); return analyze(f); }})), "couldn't be decoded");
 }
 async function runJobs(jobs, failWord, say = status) {
@@ -979,7 +983,7 @@ drop.ondrop = async e => {
 let armed = 0;
 $('clear').onclick = () => {
   if (Date.now() - armed > 4000) { armed = Date.now(); $('clear').textContent = `✕ Click again to remove ${LIB.length} tracks`; return setTimeout(() => $('clear').textContent = '✕ Clear library', 4000); }
-  LIB = []; custom = []; ref = null; save(); rebuild(); $('clear').textContent = '✕ Clear library'; status('Library cleared · your audio files are untouched');
+  resetLib(); $('clear').textContent = '✕ Clear library'; status('Library cleared · your audio files are untouched');
 };
 
 /* ---------- taste console ---------- */
@@ -1062,7 +1066,7 @@ function detail(t) {
     <div class=tiles><div><b>${esc(t.keyName)}</b><span class=mono>Key</span></div><div><b>${t.key}</b><span class=mono>Camelot</span></div><div><b>${Math.round(t.bpm)}</b><span class=mono>BPM</span></div><div><b>${mmss(t.dur)}</b><span class=mono>Duration</span></div>${t.wave ? `<div><b>${mmss(t.intro)}</b><span class=mono>Intro</span></div><div><b>${mmss(t.outro)}</b><span class=mono>Outro</span></div>` : ''}${t.mikEnergy != null ? `<div><b>${t.mikEnergy}</b><span class=mono>MIK energy</span></div>` : ''}</div>
     <div class=mono style="margin:-6px 0 14px">Key ${t.keySrc == 'tag' ? `from file tag · Vibe Check detected ${t.aiKey}` : t.keySrc == 'api' ? 'and numbers from streaming catalogue data' : 'detected by Vibe Check'}</div>${wave(t)}
     <div class=rings>${ring('Danceability', t.dance / 100, t.dance)}${ring('Energy', t.energy / 100, t.energy)}${t.ai ? ring('Happiness', t.happy / 100, t.happy) + ring('Acoustic', t.acoustic / 100, t.acoustic) + ring('Instrumental', t.instr / 100, t.instr) : ''}${ring('Loudness', (t.loud + 30) / 25, t.loud)}${t.bright == null ? '' : ring('Brightness', (t.bright - 1000) / 4000, (t.bright / 1000).toFixed(1) + 'k') + ring('Busyness', t.busy / 8, t.busy) + ring('Dynamics', t.dyn / 10, t.dyn)}</div>
-    ${URLS.has(t.id) ? `<audio controls src="${URLS.get(t.id)}"></audio>` : `<div class=mono style="margin-top:14px">${t.stream ? `Play it from the Streaming panel (${t.stream.src})` : 'Re-add the file this session to preview it here'}</div>`}
+    ${URLS.has(t.id) ? `<audio controls src="${URLS.get(t.id)}"></audio>` : `<div class=mono style="margin-top:14px">${t.stream ? 'Catalogue data only · no audio preview for this track' : 'Re-add the file this session to preview it here'}</div>`}
     <div class=mono style="margin-top:10px;letter-spacing:.1em">${esc(t.path)}</div></td></tr>`;
 }
 function render() {
@@ -1188,9 +1192,9 @@ function dLoad(i, play = true) {
   DI = i; if (!URLS.has(t.id)) URLS.set(t.id, URL.createObjectURL(FILES.get(t.id)));
   deckA.src = URLS.get(t.id); deckA.preservesPitch = keyLock; deckA.playbackRate = 1 + pitch / 100;
   label(t); vmsg(`${title(t)}${t.artist ? ' — ' + t.artist : ''}`);
-  if (play) { stopOthers('local'); graphUp(); deckA.play().catch(e => vmsg('PLAYBACK BLOCKED · ' + e.message)); }
+  if (play) { graphUp(); deckA.play().catch(e => vmsg('PLAYBACK BLOCKED · ' + e.message)); }
 }
-function dPlay() { if (!deckA.src) { if (queue()) dLoad(0); return; } stopOthers('local'); graphUp(); deckA.play(); }
+function dPlay() { if (!deckA.src) { if (queue()) dLoad(0); return; } graphUp(); deckA.play(); }
 function dStop() { deckA.pause(); if (deckA.src) deckA.currentTime = 0; }
 function eject() {
   dStop(); DQ = []; DI = 0; pIdle = 0; deckA.removeAttribute('src'); deckA.load();
@@ -1219,9 +1223,21 @@ for (const [id, dir] of [['tpRew', -1], ['tpFf', 1]]) {
   k.onclick = e => { if (e.detail === 0) { press(id); end(); } }; // keyboard activation
 }
 deckA.onended = () => autoNext ? dLoad(DI + 1) : dStop();
+/* keyboard: never while typing, never with ⌘/Ctrl/Alt so browser shortcuts keep working */
 addEventListener('keydown', e => {
-  if (e.code != 'Space' || e.target.closest('input,textarea,select,button,[role=slider],[contenteditable]')) return;
-  e.preventDefault(); deckA.src && !deckA.paused ? deckA.pause() : dPlay();
+  if (e.metaKey || e.ctrlKey || e.altKey || document.querySelector('dialog[open]') || e.target.closest('input,textarea,select,[contenteditable]')) return;
+  const onCtl = e.target.closest('button,[role=slider]'), k = e.key.length == 1 ? e.key.toLowerCase() : e.key;
+  const act = {
+    ' ': () => deckA.src && !deckA.paused ? deckA.pause() : dPlay(),
+    ArrowRight: () => $('tpFf').click(), ArrowLeft: () => $('tpRew').click(),
+    ArrowUp: () => volSet(vol + 5), ArrowDown: () => volSet(vol - 5),
+    s: () => $('tpStop').click(), e: eject, k: () => $('bLock').click(), a: () => $('bAuto').click(), t: () => $('theme').click(),
+    1: () => $('sec-load').scrollIntoView({behavior: 'smooth'}), 2: () => $('sec-taste').scrollIntoView({behavior: 'smooth'}), 3: () => $('sec-arrange').scrollIntoView({behavior: 'smooth'}),
+    y: () => { $('sec-load').scrollIntoView({behavior: 'smooth'}); if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); },
+    o: () => $('fpick').click(), '?': () => $('keysDlg').showModal(),
+  }[k];
+  if (!act || (onCtl && (k == ' ' || k.startsWith?.('Arrow')))) return;   // let focused buttons / knobs use Space and arrows themselves
+  e.preventDefault(); act();
 });
 
 /* knobs: drag up/down, scroll, arrow keys; double-click resets */
@@ -1239,10 +1255,11 @@ function knob(el, onChange) {
   el.onwheel = e => { e.preventDefault(); set(v - Math.sign(e.deltaY) * (max - min) / 80, true); };
   el.onkeydown = e => { const st = (max - min) / (e.shiftKey ? 200 : 40);
     if (['ArrowUp', 'ArrowRight'].includes(e.key)) set(v + st); else if (['ArrowDown', 'ArrowLeft'].includes(e.key)) set(v - st);
-    else if (e.key == 'Home') set(min); else if (e.key == 'End') set(max); else return; e.preventDefault(); };
+    else if (e.key == 'Home') set(min); else if (e.key == 'End') set(max); else return; e.preventDefault(); e.stopPropagation(); };
   set(def);
+  return set;
 }
-knob($('kVol'), x => { vol = x; $('kVolV').textContent = Math.round(x); $('kVol').setAttribute('aria-valuetext', Math.round(x) + '%'); if (graph) graph.gain.gain.value = x / 100; });
+const volSet = knob($('kVol'), x => { vol = x; $('kVolV').textContent = Math.round(x); $('kVol').setAttribute('aria-valuetext', Math.round(x) + '%'); if (graph) graph.gain.gain.value = x / 100; });
 knob($('kPitch'), x => { pitch = x; const s = (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(1) + '%'; $('kPitchV').textContent = s; $('kPitch').setAttribute('aria-valuetext', s); deckA.playbackRate = 1 + x / 100; });
 $('bLock').onclick = () => { keyLock = !keyLock; deckA.preservesPitch = keyLock; $('bLock').setAttribute('aria-pressed', keyLock); $('bLock').firstElementChild.classList.toggle('on', keyLock); };
 $('bAuto').onclick = () => { autoNext = !autoNext; $('bAuto').setAttribute('aria-pressed', autoNext); $('bAuto').firstElementChild.classList.toggle('on', autoNext); };
@@ -1285,7 +1302,7 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 /* ---------- framed deck: live spec text, tilt, and paint that runs from each patch-bay jack to its section ---------- */
-['sec-load', 'sec-taste', 'sec-arrange', 'sec-stream'].forEach((id, i) => { const el = document.querySelectorAll('.wrap>section.console')[i]; if (el) el.id = id; });
+['sec-load', 'sec-taste', 'sec-arrange'].forEach((id, i) => { const el = document.querySelectorAll('.wrap>section.console')[i]; if (el) el.id = id; });
 function spec() {
   const n = LIB.length;
   if (!n) { $('spec').textContent = 'The Vibe Check VC-1 is a play-and-analyse cassette deck. Load tapes and it reads each one’s key, BPM and energy, ranks them against your taste and plays them back in harmonic order.'; return; }
@@ -1295,12 +1312,10 @@ function spec() {
 function streamStats() {
   const n = LIB.length, ch = Object.keys(F).filter(f => R[f] && W[f] > 0).length, set = n ? ordered() : [];
   const mins = Math.round(set.reduce((x, t) => x + t.dur, 0) / 60);
-  let svc = 0; try { svc = (spTok ? 1 : 0) + (AM ? 1 : 0) + ([...PL.keys()].some(k => k.startsWith('yt:')) ? 1 : 0); } catch {}
   return [
     {w: 12 + Math.min(16, Math.sqrt(n) * 3), s: `${n} tape${n == 1 ? '' : 's'}`},
     {w: 12 + ch * 1.2, s: `${ch} ch on`},
     {w: 12 + Math.min(16, Math.sqrt(set.length) * 3), s: set.length ? `${set.length} · ${mins} min` : 'empty'},
-    {w: 12 + svc * 5, s: svc ? `${svc} linked` : 'none'},
   ];
 }
 const growUntil = performance.now() + 7000;
@@ -1403,6 +1418,7 @@ async function sortList(items, say) {
   if (!items.length) return say('No songs found — use one per line, “Artist - Title”');
   if (location.protocol == 'file:') return say('Streaming data works on the hosted site (vibe.wasteyourtime.in), not a local file');
   if (busy) return say('Already analysing — wait for this batch');
+  const how = await askMerge(items.length); if (how == 'cancel') return say('Cancelled'); if (how == 'fresh') resetLib();
   const seen = new Set(LIB.map(t => t.id)), todo = items.slice(0, 1000).filter(it => !seen.has(pvId(it)) && seen.add(pvId(it)));
   const left = await fromStreams(todo, say), got = todo.length - left.length;
   if (!left.length) return say(`Done · ${got} tracks from streaming data · library ${LIB.length}`);
@@ -1431,8 +1447,6 @@ function parseCSV(text) {
 $('pasteGo').onclick = () => sortList(parseLines($('plain').value), status);
 $('csvpick').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   const txt = await f.text(), items = parseCSV(txt) || parseLines(txt); sortList(items, status); };
-$('anaPl').onclick = () => { if (!STRACKS.length) return sstatus('Choose a playlist first');
-  sortList(STRACKS, m => { sstatus(m); status(m); }).then(drawPl); };
 
 /* ---------- row actions + drag arrange ---------- */
 const out = $('out');
@@ -1473,218 +1487,22 @@ $('m3u').onclick = () => {
 try { $('base').value = localStorage.getItem('vc_base') || ''; } catch {}
 
 
-/* ---------- streaming: Spotify · Apple Music · YouTube ---------- */
-// Fill these in once (see README). Spotify client IDs and restricted YouTube keys are safe in page code.
-const CONFIG = {
-  spotifyClientId: '',
-  appleTokenUrl: '/api/apple-token',
-};
-const get = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
-const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-const sstatus = s => $('sstatus').textContent = s;
-const fail = (what, e) => { console.warn(what, e); sstatus(`${what}: ${e.message || e}`); };
+/* ---------- YouTube playlists (public / unlisted) → the library ---------- */
 const norm = s => (s || '').toLowerCase().replace(/\(.*?\)|\[.*?\]|\bfeat\..*|\bft\..*|original mix|official (music )?video|lyrics?|[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
-const matchLocal = it => { const n = norm(it.title); return n && LIB.find(t => { const m = norm(title(t)); return m && (m == n || (Math.min(m.length, n.length) > 3 && (m.includes(n) || n.includes(m)))); }); };
-const PL = new Map(); // playlist key -> {src, name, load()}
-let STRACKS = [];
-
-/* Spotify (PKCE login in the browser, Web Playback SDK needs Premium) */
-const SP_REDIRECT = location.origin + location.pathname;
-const SP_SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state playlist-read-private playlist-read-collaborative playlist-modify-private';
-const b64url = b => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-let spTok = get('sp_tok'), spPlayer, spDevice;
-async function spLogin() {
-  if (!CONFIG.spotifyClientId) return sstatus('Add your Spotify Client ID to CONFIG in index.html first (see README)');
-  if (location.protocol == 'file:') return sstatus('Spotify login needs the hosted site (https), not a local file');
-  const v = b64url(crypto.getRandomValues(new Uint8Array(48))); sessionStorage.setItem('sp_v', v);
-  const c = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(v)));
-  location = 'https://accounts.spotify.com/authorize?' + new URLSearchParams({client_id: CONFIG.spotifyClientId, response_type: 'code', redirect_uri: SP_REDIRECT, code_challenge_method: 'S256', code_challenge: c, scope: SP_SCOPES});
-}
-async function spToken(body) {
-  const r = await fetch('https://accounts.spotify.com/api/token', {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({client_id: CONFIG.spotifyClientId, ...body})});
-  const j = await r.json(); if (!j.access_token) throw Error(j.error_description || 'login failed');
-  spTok = {a: j.access_token, r: j.refresh_token || spTok?.r, exp: Date.now() + j.expires_in * 1000 - 60000}; put('sp_tok', spTok); return spTok;
-}
-async function sp(path, opt = {}) {
-  if (!spTok) throw Error('not connected');
-  if (Date.now() > spTok.exp) await spToken({grant_type: 'refresh_token', refresh_token: spTok.r});
-  const r = await fetch(path.startsWith('http') ? path : 'https://api.spotify.com/v1' + path, {...opt, headers: {Authorization: 'Bearer ' + spTok.a, 'Content-Type': 'application/json'}});
-  if (r.status == 401) { put('sp_tok', spTok = null); throw Error('session expired, connect again'); }
-  if (!r.ok) throw Error(`Spotify ${r.status} ${(await r.text()).slice(0, 120)}`);
-  return r.status == 204 ? null : r.json().catch(() => null);
-}
-async function spAll(path) { const out = []; for (let u = path; u;) { const j = await sp(u); out.push(...j.items); u = j.next; } return out; }
-async function spConnected() {
-  const lists = await spAll('/me/playlists?limit=50');
-  for (const p of lists) PL.set('sp:' + p.id, {src: 'Spotify', name: p.name, load: async () =>
-    (await spAll(`/playlists/${p.id}/items?limit=100`)).map(x => x.item || x.track).filter(t => t && t.uri)
-      .map(t => ({src: 'spotify', id: t.uri, isrc: t.external_ids?.isrc, title: t.name, artist: t.artists.map(a => a.name).join(', '), dur: t.duration_ms / 1000}))});
-  $('spConnect').textContent = '✓ Spotify'; fillPlaylists(); sstatus(`Spotify connected · ${lists.length} playlists`);
-}
-function spReady() {
-  if (spDevice) return Promise.resolve(spDevice);
-  return new Promise((ok, no) => {
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      spPlayer = new Spotify.Player({name: 'Vibe Check', getOAuthToken: cb => (Date.now() > spTok.exp ? spToken({grant_type: 'refresh_token', refresh_token: spTok.r}) : Promise.resolve()).then(() => cb(spTok.a)), volume: 0.8});
-      spPlayer.addListener('ready', ({device_id}) => ok(spDevice = device_id));
-      spPlayer.addListener('account_error', () => no(Error('Spotify playback needs Premium')));
-      spPlayer.addListener('authentication_error', e => no(Error(e.message)));
-      spPlayer.addListener('player_state_changed', s => s && nowPlaying(s.track_window.current_track.name, s.track_window.current_track.artists.map(a => a.name).join(', ')));
-      spPlayer.connect();
-    };
-    script('https://sdk.scdn.co/spotify-player.js').catch(no);
-  });
-}
-$('spConnect').onclick = () => spTok ? spConnected().catch(e => fail('Spotify', e)) : spLogin();
-
-/* Apple Music (MusicKit JS; developer token comes from /api/apple-token) */
-let AM;
-async function amInit() {
-  if (AM) return AM;
-  const r = await fetch(CONFIG.appleTokenUrl); if (!r.ok) throw Error('developer token not set up on the server (see README)');
-  const tok = (await r.text()).trim();
-  if (!window.MusicKit) { const loaded = new Promise(ok => document.addEventListener('musickitloaded', ok, {once: true})); await script('https://js-cdn.music.apple.com/musickit/v3/musickit.js'); if (!window.MusicKit) await loaded; }
-  await MusicKit.configure({developerToken: tok, app: {name: 'Vibe Check', build: '1.0'}});
-  AM = MusicKit.getInstance(); await AM.authorize();
-  AM.addEventListener('nowPlayingItemDidChange', () => AM.nowPlayingItem && nowPlaying(AM.nowPlayingItem.title, AM.nowPlayingItem.artistName));
-  return AM;
-}
-async function amAll(path) { const out = []; for (let u = path; u;) { const j = (await AM.api.music(u)).data; out.push(...j.data); u = j.next; } return out; }
-$('amConnect').onclick = async () => {
-  try {
-    await amInit(); const lists = await amAll('/v1/me/library/playlists?limit=100');
-    for (const p of lists) PL.set('am:' + p.id, {src: 'Apple Music', name: p.attributes.name, load: async () =>
-      (await amAll(`/v1/me/library/playlists/${p.id}/tracks?limit=100`)).filter(t => t.attributes?.playParams)
-        .map(t => ({src: 'apple', id: t.attributes.playParams.catalogId || t.id, title: t.attributes.name, artist: t.attributes.artistName, dur: t.attributes.durationInMillis / 1000}))});
-    $('amConnect').textContent = '✓ Apple Music'; fillPlaylists(); sstatus(`Apple Music connected · ${lists.length} playlists`);
-  } catch (e) { fail('Apple Music', e); }
-};
-
-/* YouTube (public/unlisted playlists via Data API key; playback via the official embedded player) */
-let YT_P, ytReady;
+$('ytOpen').onclick = () => { const r = $('ytRow'); r.hidden = !r.hidden; $('ytOpen').setAttribute('aria-expanded', !r.hidden); if (!r.hidden) $('ytUrl').focus(); };
 $('ytLoad').onclick = async () => {
   const id = ($('ytUrl').value.match(/[?&]list=([\w-]+)/) || [])[1] || $('ytUrl').value.trim();
-  if (!/^[\w-]{10,64}$/.test(id)) return sstatus('Paste a playlist link — it contains list=…');
-  if (location.protocol == 'file:') return sstatus('YouTube playlists load on the hosted site (vibe.wasteyourtime.in), not a local file');
-  sstatus('Reading YouTube playlist…');
+  if (!/^[\w-]{10,64}$/.test(id)) return status('Paste a playlist link — it contains list=…');
+  if (location.protocol == 'file:') return status('YouTube playlists load on the hosted site (vibe.wasteyourtime.in), not a local file');
+  status('Reading YouTube playlist…');
   try {
     const r = await fetch('/api/yt?list=' + id), j = await r.json().catch(() => ({}));
     if (!r.ok) throw Error((j.error || r.status) + (j.tried ? ` [${j.tried.join(' · ')}]` : ''));
-    const items = j.items.map(x => ({src: 'youtube', ...x}));
-    PL.set('yt:' + id, {src: 'YouTube', name: `YouTube playlist (${items.length}${j.partial ? ' newest only — needs API key' : ''})`, load: async () => items});
-    fillPlaylists(); $('plist').value = 'yt:' + id; await showPlaylist();
-    if (j.partial) sstatus(`YouTube only gave the newest ${items.length} tracks — the site owner needs to add a YouTube API key for full playlists`);
-  } catch (e) { fail('YouTube', e); }
+    if (j.partial) status(`YouTube only gave the newest ${j.items.length} tracks — add a YouTube API key for full playlists`);
+    await sortList(j.items.map(x => ({src: 'youtube', ...x})), status);
+  } catch (e) { status(`YouTube: ${e.message || e}`); }
 };
 $('ytUrl').onkeydown = e => e.key == 'Enter' && $('ytLoad').click();
-function ytPlayer() {
-  if (ytReady) return ytReady;
-  return ytReady = new Promise(ok => {
-    window.onYouTubeIframeAPIReady = () => { YT_P = new YT.Player('ytbox', {width: 200, height: 200, playerVars: {playsinline: 1}, events: {onReady: ok, onStateChange: e => e.data == 0 && step(1)}}); };
-    script('https://www.youtube.com/iframe_api').catch(e => fail('YouTube player', Error('could not load')));
-  });
-}
-
-/* playlists + table */
-function fillPlaylists() {
-  const groups = {}; for (const [k, p] of PL) (groups[p.src] ||= []).push(`<option value="${esc(k)}">${esc(p.name)}</option>`);
-  const v = $('plist').value;
-  $('plist').innerHTML = '<option value="">Choose a playlist…</option>' + Object.entries(groups).map(([g, o]) => `<optgroup label="${g}">${o.join('')}</optgroup>`).join('');
-  $('plist').value = v;
-}
-async function showPlaylist() {
-  const p = PL.get($('plist').value); if (!p) return;
-  sstatus(`Loading ${p.name}…`);
-  try { STRACKS = await p.load(); } catch (e) { return fail(p.src, e); }
-  drawPl();
-  if (location.protocol != 'file:') sortList(STRACKS, m => { sstatus(m); status(m); }).then(drawPl);
-}
-function drawPl() {
-  const hits = STRACKS.map(it => LIB.find(t => t.id == pvId(it)) || matchLocal(it));
-  sstatus(`${STRACKS.length} tracks · ${hits.filter(Boolean).length} with data`);
-  $('sout').innerHTML = STRACKS.map((it, i) => { const t = hits[i];
-    return `<tr><td class=n>${String(i + 1).padStart(2, '0')}</td><td class=t>${esc(it.title)}<small>${esc(it.artist)}</small></td><td class=mono>${it.src}</td>
-      <td class=tr>${t ? `<b>${t.bpm}</b> bpm · <span class=key style="--kc:${kc(t.key)}">${t.key}</span> · energy <b>${t.energy}</b> · dance <b>${t.dance}</b>` : '…'}</td>
-      <td class=act><button data-i=${i} title="Play from here">▶</button></td></tr>`; }).join('');
-}
-$('plist').onchange = showPlaylist;
-$('sout').onclick = e => { const i = e.target.dataset?.i; if (i != null) play(+i); };
-
-/* one player bar for all three sources */
-let Q = {items: [], i: 0};
-function nowPlaying(t, a) { $('pbar').hidden = false; $('ptitle').textContent = t; $('partist').textContent = a || ''; }
-function stopOthers(src) {
-  if (src != 'local') deckA.pause();
-  if (src != 'spotify') spPlayer?.pause();
-  if (src != 'apple') AM?.pause();
-  if (src != 'youtube') YT_P?.pauseVideo?.();
-  $('ytbox').style.display = src == 'youtube' ? '' : 'none';
-}
-async function play(i, items = STRACKS) {
-  Q = {items, i}; const it = items[i]; if (!it) return;
-  stopOthers(it.src); $('psrc').textContent = it.src; nowPlaying(it.title, it.artist);
-  try {
-    if (it.src == 'spotify') {
-      const dev = await spReady(), rest = items.slice(i, i + 100).filter(x => x.src == 'spotify');
-      await sp(`/me/player/play?device_id=${dev}`, {method: 'PUT', body: JSON.stringify({uris: rest.map(x => x.id)})});
-    } else if (it.src == 'apple') {
-      await AM.setQueue({songs: items.slice(i).filter(x => x.src == 'apple').map(x => x.id), startPlaying: true});
-    } else {
-      await ytPlayer(); YT_P.loadVideoById(it.id);
-    }
-  } catch (e) { fail('Playback', e); }
-}
-function step(d) {
-  const src = Q.items[Q.i]?.src;
-  if (src == 'spotify') return d > 0 ? spPlayer?.nextTrack() : spPlayer?.previousTrack();
-  if (src == 'apple') return d > 0 ? AM?.skipToNextItem() : AM?.skipToPreviousItem();
-  if (Q.items[Q.i + d]) play(Q.i + d, Q.items);
-}
-$('pnext').onclick = () => step(1);
-$('pprev').onclick = () => step(-1);
-$('ptog').onclick = () => {
-  const src = Q.items[Q.i]?.src;
-  if (src == 'spotify') spPlayer?.togglePlay();
-  else if (src == 'apple') AM.isPlaying ? AM.pause() : AM.play();
-  else if (YT_P) YT_P.getPlayerState() == 1 ? YT_P.pauseVideo() : YT_P.playVideo();
-};
-
-/* save the current Arrange order back to a service */
-async function exportTo(which) {
-  const rows = ordered(); if (!rows.length) return sstatus('Nothing in Arrange to save yet');
-  const name = `Vibe Check · ${new Date().toLocaleDateString()}`; let found = [];
-  try {
-    if (which == 'spotify') {
-      if (!spTok) return sstatus('Connect Spotify first');
-      for (const [n, t] of rows.entries()) { sstatus(`Finding on Spotify ${n + 1}/${rows.length}…`);
-        const q = `track:${title(t)}` + (t.artist ? ` artist:${t.artist}` : '');
-        const hit = (await sp('/search?' + new URLSearchParams({q, type: 'track', limit: 1}))).tracks.items[0]; if (hit) found.push(hit.uri); }
-      if (!found.length) return sstatus('None of these tracks were found on Spotify');
-      const pl = await sp('/me/playlists', {method: 'POST', body: JSON.stringify({name, public: false, description: 'Arranged in Vibe Check'})});
-      for (let k = 0; k < found.length; k += 100) await sp(`/playlists/${pl.id}/items`, {method: 'POST', body: JSON.stringify({uris: found.slice(k, k + 100)})});
-    } else {
-      await amInit();
-      for (const [n, t] of rows.entries()) { sstatus(`Finding on Apple Music ${n + 1}/${rows.length}…`);
-        const j = (await AM.api.music(`/v1/catalog/${AM.storefrontId}/search`, {term: `${title(t)} ${t.artist}`.trim(), types: 'songs', limit: 1})).data;
-        const s = j.results?.songs?.data?.[0]; if (s) found.push({id: s.id, type: 'songs'}); }
-      if (!found.length) return sstatus('None of these tracks were found on Apple Music');
-      await AM.api.music('/v1/me/library/playlists', {}, {fetchOptions: {method: 'POST', body: JSON.stringify({attributes: {name, description: 'Arranged in Vibe Check'}, relationships: {tracks: {data: found}}})}});
-    }
-    sstatus(`Saved “${name}” · ${found.length} of ${rows.length} tracks found`);
-  } catch (e) { fail('Save playlist', e); }
-}
-$('toSp').onclick = () => exportTo('spotify');
-$('toAm').onclick = () => exportTo('apple');
-
-/* finish a Spotify login redirect, or reconnect a saved session */
-(async () => {
-  const code = new URLSearchParams(location.search).get('code');
-  try {
-    if (code) { await spToken({grant_type: 'authorization_code', code, redirect_uri: SP_REDIRECT, code_verifier: sessionStorage.getItem('sp_v')}); history.replaceState(null, '', SP_REDIRECT); }
-    if (spTok) await spConnected();
-  } catch (e) { fail('Spotify', e); }
-})();
-
 
 /* ---------- collage background: a pile of pop-art cassettes and loose tape ---------- */
 /* A real paint drip: a meniscus where it leaves the edge, a body that thins as it runs,
