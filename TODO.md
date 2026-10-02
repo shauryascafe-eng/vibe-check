@@ -54,3 +54,6 @@
 ## v27 — playlist links from every free service
 - [ ] Optional: `LASTFM_API_KEY` in Vercel (free, last.fm/api/account/create) to import Last.fm profiles
 - [ ] Test one real link each: YouTube, Spotify, Apple Music, Deezer, SoundCloud, Bandcamp, JioSaavn
+
+## v37 — What is this song?
+- [ ] AUDD_API_TOKEN in Vercel (dashboard.audd.io, 300 free recognitions, then ~$5 per 1,000)

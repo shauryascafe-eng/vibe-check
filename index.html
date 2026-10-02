@@ -693,6 +693,14 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 .simdisc{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}.simdisc .mono{letter-spacing:.08em}
 .simfine>summary{cursor:pointer;letter-spacing:.14em;margin:4px 0 10px}.simfine[open]>summary{margin-bottom:12px}
 @media(max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}.simw label{grid-template-columns:86px 1fr 30px}}
+
+#idDlg{max-width:min(560px,calc(100vw - 32px))}
+.idmic{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
+.idlevel{height:6px;border-radius:3px;background:rgba(0,0,0,.08);overflow:hidden;margin-bottom:8px}.idlevel i{display:block;height:100%;width:0;background:var(--te,#ff5b1a);transition:width .08s}
+.idres{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;margin-top:10px;padding-top:14px;border-top:1px solid rgba(0,0,0,.08)}
+.idres img{border-radius:8px;box-shadow:0 8px 18px -8px rgba(0,0,0,.5)}.idres b{display:block;font-size:20px}.idres span{display:block;font-size:15px;margin-bottom:6px}
+.idres small{display:block;letter-spacing:.08em;margin-bottom:3px}.idlinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.idlinks .btn{padding:6px 10px;font-size:10px;text-decoration:none}
+@media(max-width:480px){.idres{grid-template-columns:1fr}.idres img{width:96px;height:96px}}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -845,6 +853,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
       <label class="btn solid">＋ Add files<input type=file id=fpick multiple accept="audio/*,.flac,.aiff,.aif" hidden></label>
       <label class=btn>▤ Add folder<input type=file id=dpick webkitdirectory multiple hidden></label>
       <button class=btn id=ytOpen aria-expanded=false aria-controls=ytRow>🔗 Playlist link</button>
+      <button class=btn id=idOpen>🎙 What’s this song?</button>
       <button class=btn id=clear>✕ Clear library</button>
     </div>
     <div class=svcs id=svcs aria-label="Playlist links work from"><button type=button class=svc data-s=youtube title="YouTube"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/youtube.svg)"></i><b>YouTube</b></button><button type=button class=svc data-s=ytmusic title="YT Music"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/youtubemusic.svg)"></i><b>YT Music</b></button><button type=button class=svc data-s=spotify title="Spotify"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/spotify.svg)"></i><b>Spotify</b></button><button type=button class=svc data-s=apple title="Apple Music"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/applemusic.svg)"></i><b>Apple Music</b></button><button type=button class=svc data-s=deezer title="Deezer"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/deezer.svg)"></i><b>Deezer</b></button><button type=button class=svc data-s=soundcloud title="SoundCloud"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/soundcloud.svg)"></i><b>SoundCloud</b></button><button type=button class=svc data-s=bandcamp title="Bandcamp"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/bandcamp.svg)"></i><b>Bandcamp</b></button><button type=button class=svc data-s=jiosaavn title="JioSaavn"><b>JioSaavn</b></button><button type=button class=svc data-s=lastfm title="Last.fm"><i style="--u:url(https://cdn.jsdelivr.net/npm/simple-icons@16.33.0/icons/lastdotfm.svg)"></i><b>Last.fm</b></button></div>
@@ -930,12 +939,22 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
   <p class=mono id=mergeMsg></p>
   <div class=row><button class="btn solid" value=merge>Merge</button><button class=btn value=fresh>Start fresh</button><button class=btn value=cancel>Cancel</button></div>
 </form></dialog>
+<dialog id=idDlg><form method=dialog>
+  <h3>What’s this song?</h3>
+  <div id=idBody>
+    <p class=mono>Hold your phone or laptop near the music. Vibe Check listens for 10 seconds, names the song, then measures it and finds similar ones.</p>
+    <div class=idmic><button type=button class="btn solid" id=idListen>🎙 Listen</button><label class=btn>or pick a clip<input type=file id=idFile accept="audio/*,video/*" hidden></label></div>
+    <div class=idlevel><i id=idBar></i></div>
+    <div class=mono id=idMsg></div>
+  </div>
+  <div class=row><button class=btn value=close>Close</button></div>
+</form></dialog>
 <dialog id=keysDlg><form method=dialog>
   <h3>Keyboard shortcuts</h3>
   <table class=keys-t><tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr><tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next track</td></tr>
   <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Volume</td></tr><tr><td><kbd>S</kbd></td><td>Stop</td></tr><tr><td><kbd>E</kbd></td><td>Eject</td></tr>
   <tr><td><kbd>K</kbd></td><td>Key lock</td></tr><tr><td><kbd>A</kbd></td><td>Auto next</td></tr><tr><td><kbd>1</kbd>–<kbd>4</kbd></td><td>Load · Taste · Arrange · Similar</td></tr>
-  <tr><td><kbd>L</kbd></td><td>Playlist link</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
+  <tr><td><kbd>L</kbd></td><td>Playlist link</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>I</kbd></td><td>What’s this song?</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
   <div class=row><button class="btn solid" value=ok>Got it</button></div>
 </form></dialog>
 
@@ -1471,7 +1490,7 @@ addEventListener('keydown', e => {
     s: () => $('tpStop').click(), e: eject, k: () => $('bLock').click(), a: () => $('bAuto').click(), t: () => $('theme').click(),
     1: () => $('sec-load').scrollIntoView({behavior: 'smooth'}), 2: () => $('sec-taste').scrollIntoView({behavior: 'smooth'}), 3: () => $('sec-arrange').scrollIntoView({behavior: 'smooth'}), 4: () => $('sec-similar').scrollIntoView({behavior: 'smooth'}),
     l: () => { $('sec-load').scrollIntoView({behavior: 'smooth'}); if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); },
-    o: () => $('fpick').click(), '?': () => $('keysDlg').showModal(),
+    o: () => $('fpick').click(), i: () => $('idOpen').click(), '?': () => $('keysDlg').showModal(),
   }[k];
   if (!act || (onCtl && (k == ' ' || k.startsWith?.('Arrow')))) return;   // let focused buttons / knobs use Space and arrows themselves
   e.preventDefault(); act();
@@ -1810,6 +1829,67 @@ $('simDiscover').onclick = async () => {
     say(`Ranked ${SIMX.length} tracks from outside your library by ${Object.entries(SIMW).filter(([, w]) => w >= 2).map(([k]) => FACETS[k].label.toLowerCase()).join(' & ') || 'overall sound'}${PINS.size ? ' + pinned tags' : ''}`);
   } catch (e) { say('Discover: ' + (e.message || e)); }
 };
+
+/* ---------- What's this song? — mic or clip → AudD names it → measured, profiled, and seeded into Similar ---------- */
+{
+  const msg = m => $('idMsg').textContent = m;
+  let rec, stream, raf;
+  $('idOpen').onclick = () => { $('idBody').querySelector('.idres')?.remove(); msg(''); $('idDlg').showModal(); };
+  $('idDlg').addEventListener('close', () => { rec?.state == 'recording' && rec.stop(); stream?.getTracks().forEach(t => t.stop()); cancelAnimationFrame(raf); });
+  const b64 = blob => new Promise(ok => { const r = new FileReader(); r.onload = () => ok(String(r.result).split(',')[1]); r.readAsDataURL(blob); });
+  async function identifyClip(blob) {
+    if (location.protocol == 'file:') return msg('Song recognition runs on the hosted site');
+    msg('Matching against millions of songs…');
+    try {
+      const r = await fetch('/api/identify', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({audio: await b64(blob), type: blob.type})}), j = await r.json();
+      if (!r.ok) throw Error(j.error || r.status);
+      if (!j.found) return msg('No match — try closer to the speaker, or a part with vocals or the main hook');
+      showId(j);
+    } catch (e) { msg('Recognition: ' + (e.message || e)); }
+  }
+  function showId(j) {   // not `show`: block functions leak to script scope, and show() drives the faders
+    msg('');
+    const link = (u, l) => u ? `<a class=btn href="${esc(u)}" target=_blank rel=noopener>${l}</a>` : '';
+    const yt = `https://music.youtube.com/search?q=${encodeURIComponent(j.artist + ' ' + j.title)}`;
+    const card = document.createElement('div'); card.className = 'idres';
+    card.innerHTML = `${j.cover ? `<img src="${esc(j.cover)}" alt="" width=120 height=120>` : ''}<div><b>${esc(j.title)}</b><span>${esc(j.artist)}</span>
+      <small class=mono>${[j.album, j.year, j.label].filter(Boolean).map(esc).join(' · ')}</small>
+      ${j.genres.length ? `<small class=mono>${j.genres.map(esc).join(' · ')}</small>` : ''}
+      <div class=idlinks>${link(j.links.spotify, 'Spotify')}${link(j.links.apple, 'Apple Music')}${link(j.links.deezer, 'Deezer')}${link(yt, 'YouTube Music')}${link(j.links.song, 'All links')}</div>
+      <div class=idlinks><button type=button class="btn solid" id=idUse>✦ Measure it &amp; find similar</button></div><div class=mono id=idDone></div></div>`;
+    $('idBody').querySelector('.idres')?.remove(); $('idBody').append(card);
+    $('idUse').onclick = async () => {
+      const it = {title: j.title, artist: j.artist, preview: j.preview || undefined, dur: j.dur, cover: j.cover, sp: j.spotifyId, isrc: j.isrc}, done = m => $('idDone').textContent = m;
+      try {
+        done('Listening to its preview — key, BPM, genre, vocals, vibe…');
+        let t = LIB.find(x => x.id == pvId(it));
+        if (!t) { t = await remoteJob(it).run(); LIB.push(t); save(); rebuild(); }
+        done(`${t.key} · ${Math.round(t.bpm)} BPM · energy ${t.energy}${t.tags?.length ? ' · ' + t.tags.join(', ') : ''}`);
+        SEED = t; SIMX = []; renderSimilar(); $('idDlg').close(); $('sec-similar').scrollIntoView({behavior: 'smooth'});
+        status(`Identified “${j.title}” — it's now the seed in Similar; press Discover for songs like it`);
+      } catch (e) { done('Couldn’t measure it: ' + (e.message || e)); }
+    };
+  }
+  $('idListen').onclick = async () => {
+    if (rec?.state == 'recording') return rec.stop();
+    try { stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: false, noiseSuppression: false, autoGainControl: false}}); }
+    catch { return msg('Microphone blocked — allow it in the browser’s address bar, or pick a clip instead'); }
+    deckA.pause();
+    const chunks = [], mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find(m => MediaRecorder.isTypeSupported?.(m)) || '';
+    rec = new MediaRecorder(stream, mime ? {mimeType: mime} : {}); rec.ondataavailable = e => chunks.push(e.data);
+    const c = new AudioContext(), an = c.createAnalyser(), buf = new Float32Array(512); c.createMediaStreamSource(stream).connect(an);
+    const t0 = performance.now();
+    const tick = () => { an.getFloatTimeDomainData(buf); const lv = Math.sqrt(buf.reduce((a, x) => a + x * x, 0) / buf.length);
+      $('idBar').style.width = Math.min(100, lv * 400) + '%'; const left = 10 - Math.floor((performance.now() - t0) / 1000);
+      $('idListen').textContent = `■ Listening… ${Math.max(0, left)}s`; raf = requestAnimationFrame(tick); };
+    rec.onstop = () => { cancelAnimationFrame(raf); stream.getTracks().forEach(t => t.stop()); c.close(); $('idBar').style.width = '0';
+      $('idListen').textContent = '🎙 Listen again'; identifyClip(new Blob(chunks, {type: rec.mimeType || 'audio/webm'})); };
+    rec.start(); tick(); setTimeout(() => rec.state == 'recording' && rec.stop(), 10000);
+  };
+  $('idFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    if (f.size > 2.8e6) return msg('That file is big — trim it to a 10–20 second clip (AudD limit)');   // ponytail: no in-browser trimming yet
+    identifyClip(f); };
+}
 
 /* ---------- row actions + drag arrange ---------- */
 const out = $('out');
