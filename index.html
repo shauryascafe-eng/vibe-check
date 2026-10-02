@@ -670,6 +670,29 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
 .frame{transform:none!important;transition:none}
 /* sections below the fold aren't painted until you scroll near them */
 .wrap>section.console{content-visibility:auto;contain-intrinsic-size:auto 900px}
+
+.simgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;margin-top:8px}
+.simctl{display:grid;gap:12px;align-content:start}.simctl select{width:100%}
+.siminfo{letter-spacing:.08em;line-height:1.6;min-height:1em}
+#simPresets{display:flex;flex-wrap:wrap}#simPresets button{flex:1 1 auto}
+.simw{display:grid;gap:6px}.simw label{display:grid;grid-template-columns:96px 1fr 34px;align-items:center;gap:10px;font-size:13px}.simw b{text-align:right;font-size:11px}
+.simtagh{display:flex;justify-content:space-between;align-items:center;margin-top:4px}.simtagh .btn{padding:6px 10px;font-size:10px}
+.tgroup{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:8px}.tgroup>.mono{width:100%;letter-spacing:.14em;font-size:10px;opacity:.7}
+.chip{font:500 11px Inter,system-ui,sans-serif;padding:4px 9px;border-radius:999px;border:1px solid rgba(0,0,0,.12);cursor:pointer;color:var(--ink);
+  background:color-mix(in srgb,var(--te,#ff5b1a) calc(var(--v) * 22%),rgba(255,255,255,.5))}
+.chip.seedtag{font-weight:650}.chip.pin{background:#1c1b19;color:#fff;border-color:#1c1b19}
+:root[data-theme=dark] .chip{background:color-mix(in srgb,var(--te,#ff5b1a) calc(var(--v) * 30%),rgba(0,0,0,.3));border-color:rgba(255,255,255,.12)}:root[data-theme=dark] .chip.pin{background:#efebe4;color:#1c1b19}
+.simh{letter-spacing:.16em;margin-bottom:6px}
+.simlist{list-style:none;margin:0 0 14px;padding:0}.simlist li{display:grid;grid-template-columns:34px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:9px 0;border-top:1px solid rgba(0,0,0,.07)}
+.simlist li.empty{display:block;color:var(--dim);font-size:13px}
+.simlist b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.simlist small{color:var(--dim);font-size:12px}
+.whys{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}.why{font:500 10px 'JetBrains Mono',monospace;letter-spacing:.06em;padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.06)}.why.hi{background:color-mix(in srgb,var(--te,#ff5b1a) 18%,transparent)}
+.simpct{font:600 15px 'JetBrains Mono',monospace;color:var(--te,var(--acc))}
+.simplay{width:30px;height:30px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:var(--k-bg,#f4f3f0);cursor:pointer;font-size:11px}
+.simadd{padding:4px 10px}
+.simdisc{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 10px}.simdisc .mono{letter-spacing:.08em}
+.simfine>summary{cursor:pointer;letter-spacing:.14em;margin:4px 0 10px}.simfine[open]>summary{margin-bottom:12px}
+@media(max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}.simw label{grid-template-columns:86px 1fr 30px}}
 </style>
 
 <canvas id=art aria-hidden=true></canvas>
@@ -790,7 +813,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
           </div>
           <div class=ribbon aria-hidden=true></div>
           <div class=keys><button class="tkey" id=tpRew aria-label="Rewind / previous track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M12 6v12L3 12zM21 6v12l-9-6z"/></svg><span>Rew</span></button><button class="tkey play" id=tpPlay aria-label="Play"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M7 5v14l12-7z"/></svg><span>Play</span></button><button class="tkey" id=tpPause aria-label="Pause"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg><span>Pause</span></button><button class="tkey" id=tpStop aria-label="Stop"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M6 6h12v12H6z"/></svg><span>Stop</span></button><button class="tkey" id=tpFf aria-label="Fast forward / next track (hold to scan)"><i class=led></i><svg viewBox="0 0 24 24" aria-hidden=true><path d="M3 6v12l9-6zM12 6v12l9-6z"/></svg><span>F.Fwd</span></button></div>
-          <div class=patch><span class=print>Patch bay · jump to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a></div></div>
+          <div class=patch><span class=print>Patch bay · jump to each section</span><div class=jacks><a class=jack href="#sec-load" style="--jc:var(--c3)" aria-label="Line in: go to Load tapes"><span>Line in</span><b id=jst0>—</b><i></i></a><a class=jack href="#sec-taste" style="--jc:var(--c4)" aria-label="Tone: go to Taste console"><span>Tone</span><b id=jst1>—</b><i></i></a><a class=jack href="#sec-arrange" style="--jc:var(--c5)" aria-label="Seq out: go to Arrange"><span>Seq out</span><b id=jst2>—</b><i></i></a><a class=jack href="#sec-similar" style="--jc:var(--c6)" aria-label="Similar: go to Similar"><span>Similar</span><b id=jst3>—</b><i></i></a></div></div>
           </div>
           <div class="side side-r"><span class=print>Level · R</span><svg class=vumeter viewBox="0 0 220 136" role="img" aria-label="R channel level meter">
       <rect width=220 height=136 rx=9 fill="#2a2622"/><rect x=7 y=7 width=206 height=110 rx=4 fill="url(#vuface)"/>
@@ -875,6 +898,31 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
     <th>Match</th><th>Transition</th><th></th></tr></thead><tbody id=out></tbody></table></div>
 </section>
 
+<section class=console>
+  <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
+  <h2>Similar</h2>
+  <div class="rule mono">Genre · era · vocals · instruments · vibe · groove — choose what “similar” means</div>
+  <div class=simgrid>
+    <div class=simctl>
+      <label class=mono for=simSeed>Seed track</label>
+      <select id=simSeed aria-label="Seed track"></select>
+      <div class="mono siminfo" id=simSeedInfo></div>
+      <div class=seg id=simPresets><button data-p="Balanced" class=on>Balanced</button><button data-p="Same genre">Same genre</button><button data-p="Same vocals">Same vocals</button><button data-p="Same instruments">Same instruments</button><button data-p="Same vibe">Same vibe</button><button data-p="Next in the mix">Next in the mix</button></div>
+      <details class=simfine id=simFine open><summary class=mono>Fine-tune facets &amp; pin tags</summary>
+      <div class=simw id=simW><label><span>Genre</span><input type=range min=0 max=3 step=0.1 data-f=genre><b class=mono></b></label><label><span>Era</span><input type=range min=0 max=3 step=0.1 data-f=era><b class=mono></b></label><label><span>Vocals</span><input type=range min=0 max=3 step=0.1 data-f=vocals><b class=mono></b></label><label><span>Instruments</span><input type=range min=0 max=3 step=0.1 data-f=instruments><b class=mono></b></label><label><span>Vibe</span><input type=range min=0 max=3 step=0.1 data-f=vibe><b class=mono></b></label><label><span>Groove</span><input type=range min=0 max=3 step=0.1 data-f=groove><b class=mono></b></label><label><span>Sound</span><input type=range min=0 max=3 step=0.1 data-f=sound><b class=mono></b></label></div>
+      <div class=simtagh><span class=mono>Pin tags the match must have</span><button class=btn id=simClear>Clear pins</button></div>
+      <div id=simTags></div>
+      </details>
+    </div>
+    <div class=simres>
+      <div class="mono simh">From your library</div>
+      <ol class=simlist id=simList></ol>
+      <div class=simdisc><button class="btn solid" id=simDiscover>✦ Discover beyond my library</button><span class=mono id=simStatus></span></div>
+      <ol class=simlist id=simDisc></ol>
+    </div>
+  </div>
+</section>
+
 </div>
 
 <dialog id=mergeDlg><form method=dialog>
@@ -886,7 +934,7 @@ kbd{font:600 11px 'JetBrains Mono',monospace;padding:3px 7px;border-radius:5px;b
   <h3>Keyboard shortcuts</h3>
   <table class=keys-t><tr><td><kbd>Space</kbd></td><td>Play / pause</td></tr><tr><td><kbd>←</kbd> <kbd>→</kbd></td><td>Previous / next track</td></tr>
   <tr><td><kbd>↑</kbd> <kbd>↓</kbd></td><td>Volume</td></tr><tr><td><kbd>S</kbd></td><td>Stop</td></tr><tr><td><kbd>E</kbd></td><td>Eject</td></tr>
-  <tr><td><kbd>K</kbd></td><td>Key lock</td></tr><tr><td><kbd>A</kbd></td><td>Auto next</td></tr><tr><td><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></td><td>Load · Taste · Arrange</td></tr>
+  <tr><td><kbd>K</kbd></td><td>Key lock</td></tr><tr><td><kbd>A</kbd></td><td>Auto next</td></tr><tr><td><kbd>1</kbd>–<kbd>4</kbd></td><td>Load · Taste · Arrange · Similar</td></tr>
   <tr><td><kbd>L</kbd></td><td>Playlist link</td></tr><tr><td><kbd>O</kbd></td><td>Add files</td></tr><tr><td><kbd>T</kbd></td><td>Theme</td></tr><tr><td><kbd>?</kbd></td><td>This list</td></tr></table>
   <div class=row><button class="btn solid" value=ok>Got it</button></div>
 </form></dialog>
@@ -924,6 +972,7 @@ let ac;
 const script = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.append(s); });
 /* ---------- analysis runs in background workers (Essentia DSP + AI models trained on public MSD / Last.fm data) ---------- */
 const TFJS = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.5.0/dist/', TFW = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-wasm@3.5.0/dist/';
+const MSD = ["rock","pop","alternative","indie","electronic","female vocalists","dance","2000s","alternative rock","jazz","beautiful","metal","chillout","male vocalists","classic rock","soul","indie rock","mellow","electronica","80s","folk","90s","chill","instrumental","punk","oldies","blues","hard rock","ambient","acoustic","experimental","female vocalist","guitar","hip-hop","70s","party","country","easy listening","sexy","catchy","funk","electro","heavy metal","progressive rock","60s","rnb","indie pop","sad","house","happy"];   // the 50 Million-Song-Dataset tags MusiCNN scores every track on
 const WORKER_SRC = `
 self.exports = {};
 const ESS = ${JSON.stringify(ESS)}, TFJS = ${JSON.stringify(TFJS)}, TFW = ${JSON.stringify(TFW)};
@@ -931,7 +980,7 @@ const GH = 'https://cdn.jsdelivr.net/gh/MTG/essentia.js@819c00e8f034dc709e3d330e
 const MODELS = {dance: 'demos/mood-classifiers/models/danceability-musicnn-msd-2', happy: 'demos/mood-classifiers/models/mood_happy-musicnn-msd-2',
   aggr: 'demos/mood-classifiers/models/mood_aggressive-musicnn-msd-2', relax: 'demos/mood-classifiers/models/mood_relaxed-musicnn-msd-2',
   tags: 'starter-code/autotagging/models/msd-musicnn-1'};
-const TAGS = ${JSON.stringify(["rock","pop","alternative","indie","electronic","female vocalists","dance","2000s","alternative rock","jazz","beautiful","metal","chillout","male vocalists","classic rock","soul","indie rock","mellow","electronica","80s","folk","90s","chill","instrumental","punk","oldies","blues","hard rock","ambient","acoustic","experimental","female vocalist","guitar","hip-hop","70s","party","country","easy listening","sexy","catchy","funk","electro","heavy metal","progressive rock","60s","rnb","indie pop","sad","house","happy"])};
+const TAGS = ${JSON.stringify(MSD)};
 const SKIP = new Set(['2000s','80s','90s','70s','60s','oldies','female vocalist','beautiful','catchy','sexy','instrumental','male vocalists','female vocalists','acoustic']);
 importScripts(ESS + 'essentia-wasm.umd.js', ESS + 'essentia.js-core.umd.js', ESS + 'essentia.js-model.umd.js');
 const W = exports.EssentiaWASM, E = new Essentia(W);
@@ -959,6 +1008,7 @@ async function aiFeatures(a16) {
     instr: t[23] / (t[23] + sum(VOC) + 1e-6), acoustic: t[29] / (t[29] + sum(ELEC) + 1e-6),
     electronic: sum(ELEC) / (sum(ELEC) + t[29] + sum(VOC) * 0.5 + 1e-6),
     tags: TAGS.map((n, i) => [n, t[i]]).filter(([n, v]) => !SKIP.has(n) && v > 0.1).sort((a, b) => b[1] - a[1]).slice(0, 3).map(x => x[0]),
+    tv: Array.from(t, x => +x.toFixed(3)),
   };
 }
 async function analyse(a44, a16) {
@@ -974,6 +1024,7 @@ async function analyse(a44, a16) {
       dance: pct(m ? 0.7 * m.dance + 0.3 * dfa / 2 : dfa / 2),
       energy: pct(m ? 0.35 * m.aggr + 0.25 * (1 - m.relax) + 0.4 * sig : sig),
       happy: m ? pct(m.happy) : null, acoustic: m ? pct(m.acoustic) : null, instr: m ? pct(m.instr) : null, tags: m ? m.tags : [],
+      tv: m ? m.tv : null, aggr: m ? pct(m.aggr) : null, relax: m ? pct(m.relax) : null,
     };
   } finally { v.delete(); }
 }
@@ -1206,7 +1257,7 @@ function tastePreview() {   // the top of the ranking, right under the faders, s
   $('tlist').innerHTML = top.map(([d, t]) => `<li><b>${esc(title(t))}</b><small>${t.artist ? esc(t.artist) + ' · ' : ''}${Math.round(t.bpm)} bpm · <span class=key style="--kc:${kc(t.key)}">${t.key}</span> · energy ${t.energy}</small><span class=tpm>${Math.max(0, Math.round(100 * (1 - d)))}%</span></li>`).join('');
 }
 function render() {
-  tastePreview();
+  tastePreview(); simDirty();
   document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.m == mode));
   $('sortby').value = mode == 'sort' ? sortKey : ''; document.querySelectorAll('th.s').forEach(th => { th.classList.toggle('on', mode == 'sort' && th.dataset.k == sortKey); });
   if (!LIB.length) { $('sub').textContent = 'Empty library'; $('out').innerHTML = '<tr><td colspan=11 class="empty mono">No tapes loaded yet · drop a folder above</td></tr>'; deck(); return; }
@@ -1418,7 +1469,7 @@ addEventListener('keydown', e => {
     ArrowRight: () => $('tpFf').click(), ArrowLeft: () => $('tpRew').click(),
     ArrowUp: () => volSet(vol + 5), ArrowDown: () => volSet(vol - 5),
     s: () => $('tpStop').click(), e: eject, k: () => $('bLock').click(), a: () => $('bAuto').click(), t: () => $('theme').click(),
-    1: () => $('sec-load').scrollIntoView({behavior: 'smooth'}), 2: () => $('sec-taste').scrollIntoView({behavior: 'smooth'}), 3: () => $('sec-arrange').scrollIntoView({behavior: 'smooth'}),
+    1: () => $('sec-load').scrollIntoView({behavior: 'smooth'}), 2: () => $('sec-taste').scrollIntoView({behavior: 'smooth'}), 3: () => $('sec-arrange').scrollIntoView({behavior: 'smooth'}), 4: () => $('sec-similar').scrollIntoView({behavior: 'smooth'}),
     l: () => { $('sec-load').scrollIntoView({behavior: 'smooth'}); if ($('ytRow').hidden) $('ytOpen').click(); else $('ytUrl').focus(); },
     o: () => $('fpick').click(), '?': () => $('keysDlg').showModal(),
   }[k];
@@ -1519,7 +1570,7 @@ function frame(now) {
 requestAnimationFrame(frame);
 
 /* ---------- framed deck: live spec text, tilt, and paint that runs from each patch-bay jack to its section ---------- */
-['sec-load', 'sec-taste', 'sec-arrange'].forEach((id, i) => { const el = document.querySelectorAll('.wrap>section.console')[i]; if (el) el.id = id; });
+['sec-load', 'sec-taste', 'sec-arrange', 'sec-similar'].forEach((id, i) => { const el = document.querySelectorAll('.wrap>section.console')[i]; if (el) el.id = id; });
 document.querySelectorAll('.wrap>section.console h2').forEach((h, i) => h.dataset.n = String(i + 1).padStart(2, '0'));   // not a CSS counter: content-visibility scopes counters per section
 function spec() {
   const n = LIB.length;
@@ -1534,6 +1585,7 @@ function streamStats() {
     {w: 12 + Math.min(16, Math.sqrt(n) * 3), s: `${n} tape${n == 1 ? '' : 's'}`},
     {w: 12 + ch * 1.2, s: `${ch} ch on`},
     {w: 12 + Math.min(16, Math.sqrt(set.length) * 3), s: set.length ? `${set.length} · ${mins} min` : 'empty'},
+    {w: 12, s: SEED ? (PINS.size ? `${PINS.size} pinned` : 'seeded') : 'no seed'},
   ];
 }
 const growUntil = performance.now() + 7000;
@@ -1559,7 +1611,15 @@ const pvId = it => 'pv:' + norm(cleanTitle(it.artist)) + '|' + norm(cleanTitle(i
 function remoteJob(it) {
   const title = cleanTitle(it.title), artist = cleanTitle(it.artist), id = pvId(it);
   return {id, name: `${artist ? artist + ' - ' : ''}${title}`, run: async () => {
-    let m = it.preview && {title, artist, preview: it.preview, duration: it.dur};
+    const {f, m} = await previewFile(it, title, artist);
+    const t = await analyze(f);
+    FILES.set(id, f);
+    return {...t, id, file: f.name, path: `${m.artist} - ${m.title}`, artist: m.artist, dur: m.duration || t.dur, preview: true, cover: m.cover || null,
+      stream: it.src ? {src: it.src, id: it.id} : null, keySrc: 'preview'};
+  }};
+}
+async function previewFile(it, title = cleanTitle(it.title), artist = cleanTitle(it.artist)) {
+    let m = it.preview && {title, artist, preview: it.preview, duration: it.dur, cover: it.cover};
     for (const q of m ? [] : it.qs || [`${artist} ${title}`.trim()]) {   // several phrasings for messy video titles; first hit wins
       const pr = await fetch('/api/preview?q=' + encodeURIComponent(q));
       if (pr.ok) { m = await pr.json(); break; }
@@ -1569,11 +1629,22 @@ function remoteJob(it) {
     const au = await fetch('/api/audio?u=' + encodeURIComponent(m.preview));
     if (!au.ok) throw Error('preview audio unavailable');
     const blob = await au.blob(), f = new File([blob], `${m.artist} - ${m.title}.${/mp4|m4a|aac/.test(blob.type) ? 'm4a' : 'mp3'}`, {type: blob.type});
-    const t = await analyze(f);
-    FILES.set(id, f);
-    return {...t, id, file: f.name, path: `${m.artist} - ${m.title}`, artist: m.artist, dur: m.duration || t.dur, preview: true, cover: m.cover || null,
-      stream: it.src ? {src: it.src, id: it.id} : null, keySrc: 'preview'};
-  }};
+    return {f, m};
+}
+/* background tagging: catalogue numbers arrive instantly, but genre / vocals / instruments / vibe need the audio.
+   Each catalogue-only track gets its preview analysed in the background; its key/BPM stay the catalogue's. */
+let enriching = false;
+async function enrich() {
+  if (enriching || location.protocol == 'file:') return; enriching = true;
+  const todo = () => LIB.find(t => !t.tv && !t.noPreview && t.keySrc == 'api');
+  const one = async () => { for (let t; (t = todo());) {
+    t.noPreview = true;   // claimed (and remembered if it fails)
+    try { const {f} = await previewFile({title: title(t), artist: t.artist}), a = await analyze(f);
+      Object.assign(t, {tv: a.tv, tags: a.tags, aggr: a.aggr, relax: a.relax, bright: a.bright, busy: a.busy, dyn: a.dyn, wave: a.wave, breaks: a.breaks, intro: a.intro, outro: a.outro, noPreview: false});
+      FILES.set(t.id, f); simDirty();
+    } catch {}
+  } };
+  await Promise.all(POOL.map(one)); enriching = false; save(); rebuild();
 }
 /* catalogue data first (/api/features: Spotify id or ISRC → key, BPM, energy… instantly); only the misses get preview-analysed */
 const PCN = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'], p100 = x => Math.round(100 * clamp(x));
@@ -1606,10 +1677,11 @@ async function sortList(items, say) {
   const how = await askMerge(items.length); if (how == 'cancel') return say('Cancelled'); if (how == 'fresh') resetLib();
   const seen = new Set(LIB.map(t => t.id)), todo = items.slice(0, 1000).filter(it => !seen.has(pvId(it)) && seen.add(pvId(it)));
   const left = await fromStreams(todo, say), got = todo.length - left.length;
-  if (!left.length) return say(`Done · ${got} of ${items.length} tracks added from catalogue data · library ${LIB.length}`);
+  if (!left.length) { enrich(); return say(`Done · ${got} of ${items.length} tracks added from catalogue data · library ${LIB.length}`); }
   // ponytail: misses fall back to 30-s preview analysis, capped at 300 per run
   say(`${got} from streaming data · analysing ${Math.min(left.length, 300)} more from previews…`);
   const n = Math.min(left.length, 300), fails = await runJobs(left.slice(0, 300).map(remoteJob), 'had no preview', say) ?? 0;
+  enrich();
   say(`Done · ${got + n - fails} of ${items.length} tracks added — ${got} from catalogue data, ${n - fails} analysed from previews${fails ? `, ${fails} had no preview` : ''}${left.length > 300 ? `, ${left.length - 300} left (load again with Merge)` : ''} · library ${LIB.length}`);
 }
 function parseLines(text) {
@@ -1634,13 +1706,118 @@ $('pasteGo').onclick = () => sortList(parseLines($('plain').value), status);
 $('csvpick').onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   const txt = await f.text(), items = parseCSV(txt) || parseLines(txt); sortList(items, status); };
 
+/* ---------- Similar: holistic, facet by facet ----------
+   Most "similar track" tools match BPM or beat and stop. Here every track carries a 50-tag sound profile (genre, era, vocals,
+   instruments, mood — from the MusiCNN model) plus measured audio features, grouped into facets you can weight separately,
+   and you can pin individual tags ("oldies" + "house" + "male vocalists" = classic vocal on a house groove). Each result
+   says which facets made it a match. */
+const TI = Object.fromEntries(MSD.map((t, i) => [t, i]));
+const FACETS = {
+  genre: {label: 'Genre', tags: ['rock', 'pop', 'alternative', 'indie', 'electronic', 'dance', 'alternative rock', 'jazz', 'metal', 'classic rock', 'soul', 'indie rock', 'electronica', 'folk', 'punk', 'blues', 'hard rock', 'ambient', 'experimental', 'hip-hop', 'country', 'funk', 'electro', 'heavy metal', 'progressive rock', 'rnb', 'indie pop', 'house']},
+  era: {label: 'Era', tags: ['60s', '70s', '80s', '90s', '2000s', 'oldies']},
+  vocals: {label: 'Vocals', tags: ['female vocalists', 'female vocalist', 'male vocalists', 'instrumental'], nums: [['instr', 35]]},
+  instruments: {label: 'Instruments', tags: ['guitar', 'acoustic', 'electronic', 'electro'], nums: [['acoustic', 35], ['bright', 900]]},
+  vibe: {label: 'Vibe', tags: ['beautiful', 'chillout', 'mellow', 'chill', 'party', 'easy listening', 'sexy', 'catchy', 'sad', 'happy'], nums: [['happy', 30], ['energy', 25], ['aggr', 30], ['relax', 30]]},
+  groove: {label: 'Groove', groove: true, nums: [['dance', 25], ['busy', 1.6]]},
+  sound: {label: 'Sound', nums: [['loud', 4], ['dyn', 2.5], ['bright', 900]]},
+};
+const PRESETS = {
+  Balanced: {genre: 1, era: 1, vocals: 1, instruments: 1, vibe: 1, groove: 1, sound: .5},
+  'Same genre': {genre: 3, era: .5, vocals: .5, instruments: 1, vibe: .5, groove: .5, sound: .5},
+  'Same vocals': {genre: .5, era: 1.5, vocals: 3, instruments: .5, vibe: 1, groove: .3, sound: .3},
+  'Same instruments': {genre: .5, era: .5, vocals: .5, instruments: 3, vibe: .5, groove: .5, sound: 1.5},
+  'Same vibe': {genre: .5, era: .3, vocals: .5, instruments: .5, vibe: 3, groove: 1, sound: .5},
+  'Next in the mix': {genre: 1.5, era: .3, vocals: .3, instruments: .5, vibe: 1, groove: 3, sound: .5},
+};
+let SIMW = {...PRESETS.Balanced}, SEED = null, PINS = new Set(), SIMX = [];
+const cosine = (a, b) => { let d = 0, x = 0, y = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; x += a[i] * a[i]; y += b[i] * b[i]; } return x && y ? d / Math.sqrt(x * y) : null; };
+const near = (a, b, s) => a == null || b == null ? null : Math.exp(-(((a - b) / s) ** 2) / 2);
+function keySim(a, b) { if (!a || !b) return null; if (a == b) return 1; if (compat(a, b)) return .8; const [n, l] = cam(a), [m] = cam(b), d = Math.min((n - m + 12) % 12, (m - n + 12) % 12); return Math.max(0, .55 - d * .1) * (l == cam(b)[1] ? 1 : .8); }
+function bpmSim(a, b) { if (!a || !b) return null; const d = Math.min(Math.abs(a - b), Math.abs(a - 2 * b), Math.abs(2 * a - b)) / a; return Math.exp(-((d / .035) ** 2) / 2); }
+function facetSim(f, s, t) {   // → 0..1, or null when either track lacks the data
+  const parts = [];
+  if (f.tags && s.tv && t.tv) { const ix = f.tags.map(x => TI[x]), c = cosine(ix.map(i => Math.sqrt(s.tv[i])), ix.map(i => Math.sqrt(t.tv[i]))); if (c != null) parts.push([c, 1.4]); }
+  for (const [k, sc] of f.nums || []) { const v = near(s[k], t[k], sc); if (v != null) parts.push([v, 1]); }
+  if (f.groove) { const b = bpmSim(s.bpm, t.bpm), k = keySim(s.key, t.key); if (b != null) parts.push([b, 2]); if (k != null) parts.push([k, 1.4]); }
+  if (!parts.length) return null;
+  return parts.reduce((a, [v, w]) => a + v * w, 0) / parts.reduce((a, [, w]) => a + w, 0);
+}
+function similar(s, t) {
+  let num = 0, den = 0, all = 0; const why = [];
+  for (const k in FACETS) { const w = SIMW[k] || 0; if (!w) continue; all += w; const v = facetSim(FACETS[k], s, t); if (v == null) continue; num += w * v; den += w; why.push([k, v]); }
+  if (PINS.size) {   // pinned tags: the candidate itself must carry them, whether or not the seed does
+    const v = t.tv ? [...PINS].reduce((a, x) => a + Math.min(1, t.tv[TI[x]] / .35), 0) / PINS.size : 0;
+    num += 3 * v; den += 3; all += 3; why.push(['pins', v]);
+  }
+  if (!den) return {score: 0, why};
+  const cover = den / all;   // missing data counts against a match, gently
+  return {score: num / den * (.75 + .25 * cover), why: why.sort((a, b) => b[1] * (SIMW[b[0]] || 3) - a[1] * (SIMW[a[0]] || 3)), cover};
+}
+const facetName = k => k == 'pins' ? 'Pinned tags' : FACETS[k].label;
+function simRow(t, r, extra = '') {
+  const reasons = r.why.slice(0, 3).map(([k, v]) => `<span class="why${v > .8 ? ' hi' : ''}">${facetName(k)} ${Math.round(v * 100)}</span>`).join('');
+  return `<li data-id="${esc(t.id)}"><button class=simplay title="Play" data-id="${esc(t.id)}">▶</button><div><b>${esc(t.dz ? t.title : title(t))}</b><small>${t.artist ? esc(t.artist) + ' · ' : ''}${Math.round(t.bpm)} bpm · <span class=key style="--kc:${kc(t.key)}">${t.key}</span>${t.tags?.length ? ' · ' + esc(t.tags.join(', ')) : ''}</small><div class=whys>${reasons}${r.cover < .7 ? '<span class=why>partial data</span>' : ''}</div></div><span class=simpct>${Math.round(r.score * 100)}%</span>${extra}</li>`;
+}
+function renderSimilar() {
+  const sel = $('simSeed'), cur = SEED?.id;
+  sel.innerHTML = '<option value="">Pick a track…</option>' + LIB.map(t => `<option value="${esc(t.id)}">${esc(title(t))}${t.artist ? ' — ' + esc(t.artist) : ''}</option>`).join('');
+  sel.value = cur || ''; SEED = LIB.find(t => t.id == cur) || null;
+  document.querySelectorAll('#simW input').forEach(i => { i.value = SIMW[i.dataset.f]; i.nextElementSibling.textContent = (+i.value).toFixed(1); });
+  // tag chips: the seed's own strong tags are lit; tap any tag to pin it
+  $('simTags').innerHTML = Object.entries(FACETS).filter(([, f]) => f.tags).map(([k, f]) => `<div class=tgroup><span class=mono>${f.label}</span>${f.tags.map(x => {
+    const v = SEED?.tv?.[TI[x]] ?? 0; return `<button class="chip${PINS.has(x) ? ' pin' : ''}${v > .25 ? ' seedtag' : ''}" data-tag="${esc(x)}" style="--v:${Math.min(1, v * 2).toFixed(2)}">${esc(x)}</button>`; }).join('')}</div>`).join('');
+  $('simSeedInfo').textContent = !SEED ? '' : SEED.tv ? `Sound profile: ${MSD.map((x, i) => [x, SEED.tv[i]]).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([x, v]) => `${x} ${Math.round(v * 100)}`).join(' · ')}`
+    : SEED.keySrc == 'api' ? 'Catalogue data only so far — genre, vocals and instruments are being tagged from its preview' : 'No sound profile yet — re-add the file to analyse it';
+  if (!SEED && !PINS.size) { $('simList').innerHTML = '<li class=empty>Pick a track (or press ≈ on one in Arrange), then choose what “similar” should mean.</li>'; return; }
+  const base = SEED || {}, res = LIB.filter(t => t !== SEED).map(t => [t, similar(base, t)]).sort((a, b) => b[1].score - a[1].score).slice(0, 15);
+  $('simList').innerHTML = res.length ? res.map(([t, r]) => simRow(t, r)).join('') : '<li class=empty>Load more tracks to compare against.</li>';
+  $('simDisc').innerHTML = SIMX.map(t => [t, similar(base, t)]).sort((a, b) => b[1].score - a[1].score).slice(0, 12).map(([t, r]) => simRow(t, r, `<button class="btn simadd" data-id="${esc(t.id)}" title="Add to library">＋</button>`)).join('');
+}
+if (matchMedia('(max-width:900px)').matches) $('simFine').open = false;   // phones: presets first, fine-tuning one tap away
+let simT; const simDirty = () => { clearTimeout(simT); simT = setTimeout(renderSimilar, 120); };
+$('simSeed').onchange = () => { SEED = LIB.find(t => t.id == $('simSeed').value) || null; SIMX = []; renderSimilar(); };
+$('simPresets').onclick = e => { const p = e.target.dataset?.p; if (!p) return; SIMW = {...PRESETS[p]}; document.querySelectorAll('#simPresets button').forEach(b => b.classList.toggle('on', b == e.target)); renderSimilar(); };
+$('simW').oninput = e => { const i = e.target; if (!i.dataset.f) return; SIMW[i.dataset.f] = +i.value; document.querySelectorAll('#simPresets button').forEach(b => b.classList.remove('on')); simDirty(); };
+$('simTags').onclick = e => { const x = e.target.dataset?.tag; if (!x) return; PINS.has(x) ? PINS.delete(x) : PINS.add(x); renderSimilar(); };
+$('simClear').onclick = () => { PINS.clear(); renderSimilar(); };
+const simAudio = new Audio();
+$('sec-similar').onclick = e => {
+  const b = e.target.closest('.simplay, .simadd'); if (!b) return;
+  const t = LIB.find(x => x.id == b.dataset.id) || SIMX.find(x => x.id == b.dataset.id); if (!t) return;
+  if (b.classList.contains('simadd')) { if (!LIB.some(x => x.id == t.id)) { LIB.push({...t, dz: undefined}); save(); rebuild(); } SIMX = SIMX.filter(x => x !== t); return renderSimilar(); }
+  const f = FILES.get(t.id); if (!f) return status('No audio for this one yet');
+  if (simAudio.dataset.id == t.id && !simAudio.paused) { simAudio.pause(); b.textContent = '▶'; return; }
+  deckA.pause(); simAudio.src = URL.createObjectURL(f); simAudio.dataset.id = t.id; simAudio.play();
+  document.querySelectorAll('.simplay').forEach(x => x.textContent = '▶'); b.textContent = '❚❚';
+};
+// Discover: Deezer proposes ~50 tracks around the seed; every preview is analysed and ranked by the same facets
+$('simDiscover').onclick = async () => {
+  if (!SEED) return status('Pick a seed track first');
+  if (location.protocol == 'file:') return status('Discover runs on the hosted site');
+  const say = m => $('simStatus').textContent = m;
+  say('Asking the catalogue for candidates…');
+  try {
+    const r = await fetch('/api/related?q=' + encodeURIComponent(`${SEED.artist || ''} ${title(SEED)}`.trim())), j = await r.json();
+    if (!r.ok) throw Error(j.error || r.status);
+    const have = new Set(LIB.map(t => t.id)), pool = j.items.filter(it => !have.has(pvId(it))).slice(0, 30);
+    SIMX = []; let done = 0, next = 0;
+    const one = async () => { while (next < pool.length) { const it = pool[next++];
+      try { const {f, m} = await previewFile(it), a = await analyze(f), id = pvId(it);
+        FILES.set(id, f); SIMX.push({...a, id, file: f.name, path: `${m.artist} - ${m.title}`, title: m.title, artist: m.artist, dur: m.duration || a.dur, preview: true, keySrc: 'preview', dz: true});
+      } catch {}
+      say(`Listening to candidates ${++done}/${pool.length} — ranking as they come in`); simDirty(); } };
+    await Promise.all(POOL.map(one));
+    say(`Ranked ${SIMX.length} tracks from outside your library by ${Object.entries(SIMW).filter(([, w]) => w >= 2).map(([k]) => FACETS[k].label.toLowerCase()).join(' & ') || 'overall sound'}${PINS.size ? ' + pinned tags' : ''}`);
+  } catch (e) { say('Discover: ' + (e.message || e)); }
+};
+
 /* ---------- row actions + drag arrange ---------- */
 const out = $('out');
 out.onclick = e => {
   const act = e.target.closest('[data-act]')?.dataset.act, id = e.target.closest('tr[data-id]')?.dataset.id; if (!act || !id) return;
   const t = LIB.find(x => x.id == id);
   if (act == 'open') open = open == id ? null : id;
-  if (act == 'like') { ref = t; $('refk').textContent = `${t.key} · ${title(t)}`; setTargets(t); }
+  if (act == 'like') { ref = t; $('refk').textContent = `${t.key} · ${title(t)}`; setTargets(t); SEED = t; SIMX = []; renderSimilar(); $('sec-similar').scrollIntoView({behavior: 'smooth'}); }
   if (act == 'del') { LIB = LIB.filter(x => x !== t); custom = custom.filter(x => x != id); if (ref === t) ref = null; save(); return rebuild(); }
   render();
 };
